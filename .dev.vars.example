@@ -1,0 +1,5 @@
+# Cloudflare Worker Local Environment Variables
+ORATION_PUBLIC_KEY="70588826-0a19-4c4f-abdf-6de6c720d793"
+ORATION_AGENT_ID="538568f1-6a55-4e3f-989c-164f391a8443"
+TOOL_WEBHOOK_SECRET="tatwa_internal_secret_2026"
+ALLOWED_ORIGIN="*"
