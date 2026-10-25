@@ -3267,9 +3267,17 @@
 
       const result = await res.json();
       showToast(`Action: ${result.title || result.componentType || 'Updated'}`);
+      const inspectorRes = document.getElementById('tool-inspector-response');
+      if (inspectorRes) {
+        inspectorRes.textContent = JSON.stringify(result, null, 2);
+      }
     } catch (err) {
       console.error('Failed to hit tool endpoint:', err);
       showToast('Error calling tool');
+      const inspectorRes = document.getElementById('tool-inspector-response');
+      if (inspectorRes) {
+        inspectorRes.textContent = 'Error: ' + err.message;
+      }
     }
   }
 
@@ -3458,7 +3466,126 @@
     }
   }
 
+
+  // ==========================================================================
+  // VISUALIZER SETTING TOOL (AGENT SIMULATOR) CONTROLS
+  // ==========================================================================
+  function initVisualizerSettingTool() {
+    const settingDisplayMode = document.getElementById('setting-display-mode');
+    const settingCategory = document.getElementById('setting-category');
+    const settingQuery = document.getElementById('setting-query');
+    const btnSelectAll = document.getElementById('btn-enums-select-all');
+    const btnClear = document.getElementById('btn-enums-clear');
+    const btnFire = document.getElementById('btn-fire-tatwa-tool');
+    const inspectorReq = document.getElementById('tool-inspector-request');
+    const inspectorRes = document.getElementById('tool-inspector-response');
+    const enumCheckboxes = document.querySelectorAll('input[name="tool_product_enum"]');
+
+    function getSelectedEnums() {
+      const selected = [];
+      enumCheckboxes.forEach((cb) => {
+        if (cb.checked) selected.push(cb.value);
+      });
+      return selected;
+    }
+
+    function buildCurrentPayload() {
+      const displayMode = settingDisplayMode ? settingDisplayMode.value : 'sequence';
+      const category = settingCategory && settingCategory.value ? settingCategory.value : undefined;
+      const query = settingQuery && settingQuery.value.trim() ? settingQuery.value.trim() : undefined;
+      const enums = getSelectedEnums();
+
+      const payload = {
+        tool: 'display_tatwa_products',
+        display_mode: displayMode,
+        product_enums: enums.length > 0 ? enums : undefined,
+        category: category,
+        query: query,
+        sessionId: sessionId
+      };
+
+      const cleanPayload = {};
+      for (const [k, v] of Object.entries(payload)) {
+        if (v !== undefined) cleanPayload[k] = v;
+      }
+      return cleanPayload;
+    }
+
+    function updateInspectorRequest() {
+      if (inspectorReq) {
+        const payload = buildCurrentPayload();
+        inspectorReq.textContent = JSON.stringify(payload, null, 2);
+      }
+    }
+
+    if (settingDisplayMode) settingDisplayMode.addEventListener('change', updateInspectorRequest);
+    if (settingCategory) settingCategory.addEventListener('change', updateInspectorRequest);
+    if (settingQuery) settingQuery.addEventListener('input', updateInspectorRequest);
+
+    enumCheckboxes.forEach((cb) => {
+      cb.addEventListener('change', updateInspectorRequest);
+    });
+
+    if (btnSelectAll) {
+      btnSelectAll.addEventListener('click', () => {
+        enumCheckboxes.forEach((cb) => (cb.checked = true));
+        updateInspectorRequest();
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', () => {
+        enumCheckboxes.forEach((cb) => (cb.checked = false));
+        updateInspectorRequest();
+      });
+    }
+
+    if (btnFire) {
+      btnFire.addEventListener('click', async () => {
+        const payload = buildCurrentPayload();
+        updateInspectorRequest();
+
+        if (inspectorRes) {
+          inspectorRes.textContent = 'Executing tool request via ' + backendUrl + '/api/tool...';
+        }
+
+        try {
+          const toolUrl = `${backendUrl}/api/tool?sessionId=${encodeURIComponent(sessionId)}`;
+          const res = await fetch(toolUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await res.json();
+          if (inspectorRes) {
+            inspectorRes.textContent = JSON.stringify(result, null, 2);
+          }
+          showToast(`display_tatwa_products: ${result.title || result.componentType || 'Updated'}`);
+
+          // Direct UI update fallback
+          if (result && result.componentType) {
+            handleIncomingImages({
+              componentType: result.componentType,
+              title: result.title,
+              subtitle: `Triggered by Visualizer Setting Tool (${payload.display_mode})`,
+              products: result.displayedProducts || []
+            });
+          }
+        } catch (err) {
+          console.error('[ToolSetting] Execution error:', err);
+          if (inspectorRes) {
+            inspectorRes.textContent = 'Error: ' + err.message;
+          }
+          showToast('Tool Execution Failed');
+        }
+      });
+    }
+
+    updateInspectorRequest();
+  }
+
   // Initialize
+  initVisualizerSettingTool();
   initOrationWidget();
   connectSSE();
   renderTatwaWelcomeScreen();

@@ -169,7 +169,181 @@
           <button id="btn-edit-backend" class="btn-icon" title="Custom Backend URL" style="display: none;">⚙️</button>
         </div>
 
-        <!-- Section 2: Voice Query Test Simulator -->
+        <!-- Section 2: Visualizer Setting Tool (Agent Simulator) -->
+        <div class="drawer-section visualizer-settings-tool-card" id="visualizer-settings-tool-section">
+          <div class="drawer-section-title">⚡ VISUALIZER SETTING TOOL (AGENT SIMULATOR)</div>
+          <p class="drawer-section-desc">Edit visualizer tool parameters directly in this frontend and trigger real-time panel updates:</p>
+
+          <!-- Setting: Tool Name -->
+          <div class="tool-field-row">
+            <label class="tool-field-label" for="setting-tool-name">Tool Name</label>
+            <input type="text" id="setting-tool-name" class="tool-text-input readonly" value="display_tatwa_products" readonly />
+          </div>
+
+          <!-- Setting: Display Mode -->
+          <div class="tool-field-row">
+            <label class="tool-field-label" for="setting-display-mode">Display Mode (<code>display_mode</code>)</label>
+            <select id="setting-display-mode" class="tool-select-input">
+              <option value="sequence">sequence (Category Lineup)</option>
+              <option value="comparison">comparison (Side-by-Side Matrix)</option>
+              <option value="single">single (Spotlight Single Appliance)</option>
+              <option value="manual">manual (User Manual &amp; Guides)</option>
+              <option value="offers">offers (Promotions &amp; Deals)</option>
+              <option value="welcome">welcome (Tatwa Welcome Studio)</option>
+            </select>
+          </div>
+
+          <!-- Setting: Product Enums Checklist -->
+          <div class="tool-field-group">
+            <div class="tool-field-header-row">
+              <label class="tool-field-label">Select Products (<code>product_enums</code>)</label>
+              <div class="tool-mini-btns">
+                <button type="button" id="btn-enums-select-all" class="btn-micro">Select All</button>
+                <button type="button" id="btn-enums-clear" class="btn-micro">Clear</button>
+              </div>
+            </div>
+            
+            <div class="tool-enums-container" id="tool-enums-container">
+              <!-- Chimneys -->
+              <div class="tool-enum-cat-group">
+                <div class="tool-enum-cat-title">🌪️ Chimneys (3)</div>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="CHIMNEY_AERO_BLDC_60" checked />
+                  <span>Aero BLDC 60 cm (₹21,330)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="CHIMNEY_AERO_BLDC_75" checked />
+                  <span>Aero BLDC 75 cm (₹23,118)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="CHIMNEY_AERO_BLDC_90" checked />
+                  <span>Aero BLDC 90 cm (₹24,987)</span>
+                </label>
+              </div>
+
+              <!-- Dishwashers -->
+              <div class="tool-enum-cat-group">
+                <div class="tool-enum-cat-title">🍽️ Dishwashers (10)</div>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FBID_8PR_14S" />
+                  <span>PureWash 14S Built-in (₹63,901)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FSID_8PR_14S" />
+                  <span>PureWash 14S Semi-Integrated (₹58,617)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_8PR_14S_INOX" />
+                  <span>PureWash 14S Inox (₹52,170)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_8PR_14S_BK" />
+                  <span>PureWash 14S Obsidian Black (₹51,964)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_7PR_14S_BK" />
+                  <span>PureWash 7PR 14S Eco Black (₹30,200)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_6PR_14S_BK_DIGITAL" />
+                  <span>PureWash 6PR 14S Black Digital (₹35,010)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_6PR_12S_NEO_INOX" />
+                  <span>PureWash 12S Neo Inox (₹34,250)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_6PR_12S_NEO_BK" />
+                  <span>PureWash 12S Neo Black (₹29,999)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_6PR_8S_ACE_INOX" />
+                  <span>PureWash 8S Ace Inox Tabletop (₹28,150)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="DW_FFSD_6PR_8S_ACE_BLACK" />
+                  <span>PureWash 8S Ace Black Tabletop (₹26,750)</span>
+                </label>
+              </div>
+
+              <!-- Washing Machines -->
+              <div class="tool-enum-cat-group">
+                <div class="tool-enum-cat-title">🌀 Washing Machines (4)</div>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="WM_ECOWASH_FL8_INV" />
+                  <span>EcoWash Pro 8 kg Front Load (₹27,490)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="WM_HYDROPULSE_TL75_SMT" />
+                  <span>HydroPulse 7.5 kg Top Load (₹17,990)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="WM_AEROCARE_WD10_AI" />
+                  <span>AeroCare 10 kg AI Washer-Dryer (₹44,990)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="WM_AQUASPIN_SA65_TT" />
+                  <span>AquaSpin 6.5 kg Semi-Automatic (₹9,990)</span>
+                </label>
+              </div>
+
+              <!-- Smart TVs -->
+              <div class="tool-enum-cat-group">
+                <div class="tool-enum-cat-title">📺 Smart TVs (3)</div>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="TV_VISION_55_QLED" />
+                  <span>Vision Pro 55" 4K QLED (₹36,990)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="TV_CRYSTALVIEW_65_OLED" />
+                  <span>CrystalView 65" Cinema OLED (₹99,990)</span>
+                </label>
+                <label class="enum-checkbox-label">
+                  <input type="checkbox" name="tool_product_enum" value="TV_NOVA_43_UHD" />
+                  <span>Nova 43" 4K Frameless UHD (₹21,990)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Setting: Category Filter -->
+          <div class="tool-field-row">
+            <label class="tool-field-label" for="setting-category">Category (<code>category</code>)</label>
+            <select id="setting-category" class="tool-select-input">
+              <option value="">All Categories</option>
+              <option value="chimney">Chimneys</option>
+              <option value="dishwasher">Dishwashers</option>
+              <option value="washing_machine">Washing Machines</option>
+              <option value="tv">Smart TVs</option>
+            </select>
+          </div>
+
+          <!-- Setting: Query / Search Input -->
+          <div class="tool-field-row">
+            <label class="tool-field-label" for="setting-query">Query / Prompt (<code>query</code>)</label>
+            <input type="text" id="setting-query" class="tool-text-input" placeholder="e.g. 30,000 के अंदर वाशिंग मशीन या तीनों टीवी कंपेयर करें" />
+          </div>
+
+          <!-- Action Button: Fire Tool -->
+          <div class="tool-actions-row">
+            <button type="button" id="btn-fire-tatwa-tool" class="btn-fire-tatwa-tool">
+              <span>⚡ Fire display_tatwa_products Tool</span>
+            </button>
+          </div>
+
+          <!-- Live JSON Payload & Result Inspector -->
+          <details class="tool-inspector-details" open>
+            <summary class="tool-inspector-summary">Live Tool Payload &amp; Response</summary>
+            <div class="tool-inspector-body">
+              <div class="inspector-subhead">SENT REQUEST:</div>
+              <pre id="tool-inspector-request" class="code-preview">{}</pre>
+              <div class="inspector-subhead" style="margin-top: 0.5rem;">BACKEND RESPONSE:</div>
+              <pre id="tool-inspector-response" class="code-preview">Ready. Click "Fire display_tatwa_products Tool" to test.</pre>
+            </div>
+          </details>
+        </div>
+
+        <!-- Section 3: Voice Query Test Simulator -->
         <div class="drawer-section">
           <div class="drawer-section-title">VOICE QUERY SIMULATOR</div>
           <p class="drawer-section-desc">Test how the backend visualizer handles natural language voice queries:</p>

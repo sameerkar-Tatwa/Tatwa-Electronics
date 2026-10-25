@@ -282,13 +282,73 @@ const tests = [
         res.body.brand === 'Tatwa Electronics' &&
         res.body.productCount === 20;
     }
+  },
+  {
+    id: 'TC-16',
+    name: 'display_tatwa_products with display_mode: comparison',
+    description: 'Verifies exact agent tool call format with product_enums & display_mode',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: {
+        tool: 'display_tatwa_products',
+        display_mode: 'comparison',
+        product_enums: ['CHIMNEY_AERO_BLDC_60', 'CHIMNEY_AERO_BLDC_75']
+      }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 2 &&
+        res.body.displayedProducts[0].name === 'Tatwa Aero BLDC 60 cm' &&
+        res.body.displayedProducts[1].name === 'Tatwa Aero BLDC 75 cm';
+    }
+  },
+  {
+    id: 'TC-17',
+    name: 'display_tatwa_products Washing Machine Sequence',
+    description: 'Verifies all 4 washing machine enums in sequence display mode',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: {
+        tool: 'display_tatwa_products',
+        display_mode: 'sequence',
+        product_enums: ['WM_ECOWASH_FL8_INV', 'WM_HYDROPULSE_TL75_SMT', 'WM_AEROCARE_WD10_AI', 'WM_AQUASPIN_SA65_TT']
+      }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.displayedProducts.length === 4 &&
+        res.body.displayedProducts.every(p => p.category === 'washing_machine');
+    }
+  },
+  {
+    id: 'TC-18',
+    name: 'display_tatwa_products Smart TVs Comparison',
+    description: 'Verifies side-by-side comparison of 3 Smart TVs using official enums',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: {
+        tool: 'display_tatwa_products',
+        display_mode: 'comparison',
+        product_enums: ['TV_VISION_55_QLED', 'TV_CRYSTALVIEW_65_OLED', 'TV_NOVA_43_UHD']
+      }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 3 &&
+        res.body.displayedProducts.every(p => p.category === 'tv');
+    }
   }
 ];
 
 // Runner
 async function runTestSuite() {
   console.log('===============================================================');
-  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (15 TEST CASES)`);
+  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (18 TEST CASES)`);
   console.log(`Target: ${BASE_URL}`);
   console.log('===============================================================\n');
 

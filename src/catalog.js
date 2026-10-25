@@ -724,6 +724,34 @@ TATWA_PRODUCT_CATALOG.TV_1 = TATWA_PRODUCT_CATALOG.TV_55_QLED;
 TATWA_PRODUCT_CATALOG.TV_2 = TATWA_PRODUCT_CATALOG.TV_65_OLED;
 TATWA_PRODUCT_CATALOG.TV_3 = TATWA_PRODUCT_CATALOG.TV_43_UHD;
 
+// Agent Prompt Exact Registry Enums
+TATWA_PRODUCT_CATALOG.CHIMNEY_AERO_BLDC_60 = TATWA_PRODUCT_CATALOG.AERO_60;
+TATWA_PRODUCT_CATALOG.CHIMNEY_AERO_BLDC_75 = TATWA_PRODUCT_CATALOG.AERO_75;
+TATWA_PRODUCT_CATALOG.CHIMNEY_AERO_BLDC_90 = TATWA_PRODUCT_CATALOG.AERO_90;
+TATWA_PRODUCT_CATALOG.CHIMNEY_LIBRA_BLDC_60 = TATWA_PRODUCT_CATALOG.AERO_60;
+TATWA_PRODUCT_CATALOG.CHIMNEY_LIBRA_BLDC_75 = TATWA_PRODUCT_CATALOG.AERO_75;
+TATWA_PRODUCT_CATALOG.CHIMNEY_LIBRA_BLDC_90 = TATWA_PRODUCT_CATALOG.AERO_90;
+
+TATWA_PRODUCT_CATALOG.DW_FBID_8PR_14S = TATWA_PRODUCT_CATALOG.FBID_8PR_14S;
+TATWA_PRODUCT_CATALOG.DW_FSID_8PR_14S = TATWA_PRODUCT_CATALOG.FSID_8PR_14S;
+TATWA_PRODUCT_CATALOG.DW_FFSD_8PR_14S_INOX = TATWA_PRODUCT_CATALOG.FFSD_8PR_14S;
+TATWA_PRODUCT_CATALOG.DW_FFSD_8PR_14S_BK = TATWA_PRODUCT_CATALOG.FFSD_8PR_14S_BK;
+TATWA_PRODUCT_CATALOG.DW_FFSD_7PR_14S_BK = TATWA_PRODUCT_CATALOG.FFSD_7PR_14S_BK;
+TATWA_PRODUCT_CATALOG.DW_FFSD_6PR_14S_BK_DIGITAL = TATWA_PRODUCT_CATALOG.FFSD_6PR_14S_BK_DIGITAL;
+TATWA_PRODUCT_CATALOG.DW_FFSD_6PR_12S_NEO_INOX = TATWA_PRODUCT_CATALOG.FFSD_6PR_12S_NEO_INOX;
+TATWA_PRODUCT_CATALOG.DW_FFSD_6PR_12S_NEO_BK = TATWA_PRODUCT_CATALOG.FFSD_6PR_12S_NEO_BK;
+TATWA_PRODUCT_CATALOG.DW_FFSD_6PR_8S_ACE_INOX = TATWA_PRODUCT_CATALOG.FFSD_6PR_8S_ACE_INOX;
+TATWA_PRODUCT_CATALOG.DW_FFSD_6PR_8S_ACE_BLACK = TATWA_PRODUCT_CATALOG.FFSD_6PR_8S_ACE_BLACK;
+
+TATWA_PRODUCT_CATALOG.WM_ECOWASH_FL8_INV = TATWA_PRODUCT_CATALOG.WM_FL8_INV;
+TATWA_PRODUCT_CATALOG.WM_HYDROPULSE_TL75_SMT = TATWA_PRODUCT_CATALOG.WM_TL75_SMT;
+TATWA_PRODUCT_CATALOG.WM_AEROCARE_WD10_AI = TATWA_PRODUCT_CATALOG.WM_WD10_AI;
+TATWA_PRODUCT_CATALOG.WM_AQUASPIN_SA65_TT = TATWA_PRODUCT_CATALOG.WM_SA65_TT;
+
+TATWA_PRODUCT_CATALOG.TV_VISION_55_QLED = TATWA_PRODUCT_CATALOG.TV_55_QLED;
+TATWA_PRODUCT_CATALOG.TV_CRYSTALVIEW_65_OLED = TATWA_PRODUCT_CATALOG.TV_65_OLED;
+TATWA_PRODUCT_CATALOG.TV_NOVA_43_UHD = TATWA_PRODUCT_CATALOG.TV_43_UHD;
+
 // ============================================================================
 // 2. PREDEFINED COMPONENT PAYLOADS & GUIDES
 // ============================================================================
@@ -1034,10 +1062,23 @@ export function resolveToolRequest(rawInput = {}) {
     }
   }
 
-  // 4. Action Detection
+  // 4. Action & Display Mode Detection
   let action = merged.action ? String(merged.action).toLowerCase().trim() : '';
+  const displayMode = (merged.display_mode || merged.displayMode || merged.mode || '').toLowerCase().trim();
 
-  if (action === 'welcome' || lowerText.includes('welcome') || lowerText.includes('होम') || lowerText.includes('home')) {
+  if (displayMode === 'comparison' || displayMode === 'compare') {
+    action = 'compare_products';
+  } else if (displayMode === 'manual' || displayMode === 'guide') {
+    action = 'show_manual';
+  } else if (displayMode === 'offers' || displayMode === 'deals') {
+    action = 'show_offers';
+  } else if (displayMode === 'welcome') {
+    action = 'welcome';
+  } else if (displayMode === 'single') {
+    action = 'show_products';
+  } else if (displayMode === 'sequence') {
+    action = 'sequence';
+  } else if (action === 'welcome' || lowerText.includes('welcome') || lowerText.includes('होम') || lowerText.includes('home')) {
     action = 'welcome';
   } else if (lowerText.includes('compare') || lowerText.includes('कंपेयर') || lowerText.includes('तुलना') || lowerText.includes('vs') || merged.compare === true || merged.compare === 'true') {
     action = 'compare_products';
@@ -1481,6 +1522,10 @@ export function resolveToolRequest(rawInput = {}) {
  */
 function resolveSingleProduct(query, allProducts) {
   if (!query) return null;
+  const upper = String(query).trim().toUpperCase();
+  if (TATWA_PRODUCT_CATALOG[upper]) {
+    return TATWA_PRODUCT_CATALOG[upper];
+  }
   const q = String(query).toLowerCase().trim();
 
   // 1. Direct enumKey or id match
