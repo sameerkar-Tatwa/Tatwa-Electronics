@@ -14,6 +14,11 @@
 
     if (window.TATWA_BACKEND_URL) return window.TATWA_BACKEND_URL.trim();
 
+    // If running in browser on localhost or local IP, default to current host:port
+    if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return window.location.origin;
+    }
+
     // Default to the Cloudflare Worker backend
     return 'https://tatwa-electronics-visualizer.sameer-kar.workers.dev';
   }
@@ -850,7 +855,7 @@
       <div class="tatwa-welcome-container">
         <div class="tatwa-welcome-card glass-panel">
           <div class="welcome-brand-emblem glass-card">
-            <img src="images/tatwa_logo_white.svg" alt="Tatwa Electronics" class="welcome-tatwa-logo" />
+            <img src="images/tatwa_logo.svg" alt="Tatwa Electronics" class="welcome-tatwa-logo" />
           </div>
 
           <div class="welcome-title-wrap">
@@ -874,7 +879,7 @@
             <button class="welcome-pill glass-button" data-welcome-action="dishwasher_loading">🍽️ How to Load Dishwasher</button>
             <button class="welcome-pill glass-button" data-welcome-action="dishwasher_usp">⭐ Dishwasher USPs</button>
             <button class="welcome-pill glass-button" data-welcome-action="bldc_motor">⚡ Inverter BLDC Video</button>
-            <button class="welcome-pill glass-button" data-welcome-action="show_all">👁️ Browse All 13 Models</button>
+            <button class="welcome-pill glass-button" data-welcome-action="show_all">👁️ Browse All 20 Models</button>
           </div>
         </div>
       </div>
@@ -1231,22 +1236,125 @@
                   `;
                 }).join('')}
               </tr>
-              <tr>
-                <th>Airflow / Cap</th>
-                ${products.map(p => `<td><strong>${p.suctionPower || p.capacity || '-'}</strong></td>`).join('')}
-              </tr>
-              <tr>
-                <th>Filter Tech</th>
-                ${products.map(p => `<td><strong>${p.filterDesign || p.cleaningFunction || 'Filterless Tech'}</strong></td>`).join('')}
-              </tr>
-              <tr>
-                <th>Controls</th>
-                ${products.map(p => `<td>${p.controls || 'Motion Gesture & Touch'}</td>`).join('')}
-              </tr>
-              <tr>
-                <th>Warranty</th>
-                ${products.map(p => `<td>${p.warranty || '2 Years Tatwa Warranty'}</td>`).join('')}
-              </tr>
+              ${(() => {
+                const cats = new Set(products.map(p => p.category));
+                const isTv = cats.size === 1 && cats.has('tv');
+                const isWm = cats.size === 1 && cats.has('washing_machine');
+                const isChimney = cats.size === 1 && cats.has('chimney');
+                const isDw = cats.size === 1 && cats.has('dishwasher');
+
+                if (isTv) {
+                  return `
+                    <tr>
+                      <th>Display & Screen</th>
+                      ${products.map(p => `<td><strong>${p.displaySize || '-'}</strong><div style="font-size:0.78rem; opacity:0.8;">${p.type || p.resolution || ''}</div></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Refresh Rate & HDR</th>
+                      ${products.map(p => `<td><strong>${p.refreshRate || '60 Hz'}</strong><div style="font-size:0.78rem; opacity:0.8;">${p.hdr || 'HDR'}</div></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Sound & Audio</th>
+                      ${products.map(p => `<td><strong>${p.sound || 'Stereo Speakers'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Smart OS</th>
+                      ${products.map(p => `<td>${p.os || 'Google TV'}</td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Warranty</th>
+                      ${products.map(p => `<td>${p.warranty || '3 Years Tatwa Warranty'}</td>`).join('')}
+                    </tr>
+                  `;
+                }
+
+                if (isWm) {
+                  return `
+                    <tr>
+                      <th>Capacity & Type</th>
+                      ${products.map(p => `<td><strong>${p.capacity || '-'}</strong><div style="font-size:0.78rem; opacity:0.8;">${p.type || ''}</div></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Motor & Speed</th>
+                      ${products.map(p => `<td><strong>${p.motor || 'Inverter Motor'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Programmes</th>
+                      ${products.map(p => `<td>${p.washProgrammesCount ? p.washProgrammesCount + ' Wash Programmes' : (p.programmes || '-')}</td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Energy Rating</th>
+                      ${products.map(p => `<td><strong>${p.energyRating || '5 Star BEE'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Warranty</th>
+                      ${products.map(p => `<td>${p.warranty || '3 Years Comprehensive'}</td>`).join('')}
+                    </tr>
+                  `;
+                }
+
+                if (isChimney) {
+                  return `
+                    <tr>
+                      <th>Suction Power</th>
+                      ${products.map(p => `<td><strong>${p.suctionPower || '1500 m³/hr'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Filter Tech</th>
+                      ${products.map(p => `<td><strong>${p.filterDesign || 'Filterless Tech'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Controls</th>
+                      ${products.map(p => `<td>${p.controls || 'Wave Gesture & Touch'}</td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Warranty</th>
+                      ${products.map(p => `<td>${p.warranty || '12 Years on Motor'}</td>`).join('')}
+                    </tr>
+                  `;
+                }
+
+                if (isDw) {
+                  return `
+                    <tr>
+                      <th>Capacity</th>
+                      ${products.map(p => `<td><strong>${p.capacity || '14 Place Settings'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Programmes</th>
+                      ${products.map(p => `<td>${p.programmes || p.cleaningFunction || '6–8 Programmes'}</td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Spray Technology</th>
+                      ${products.map(p => `<td><strong>${p.cleaningFunction || 'Dual Zone 3D Spray'}</strong></td>`).join('')}
+                    </tr>
+                    <tr>
+                      <th>Warranty</th>
+                      ${products.map(p => `<td>${p.warranty || '2 Years Tatwa Warranty'}</td>`).join('')}
+                    </tr>
+                  `;
+                }
+
+                // Mixed categories fallback
+                return `
+                  <tr>
+                    <th>Specification</th>
+                    ${products.map(p => `<td><strong>${p.suctionPower || p.capacity || p.displaySize || '-'}</strong></td>`).join('')}
+                  </tr>
+                  <tr>
+                    <th>Key Technology</th>
+                    ${products.map(p => `<td><strong>${p.filterDesign || p.motor || p.resolution || p.cleaningFunction || '-'}</strong></td>`).join('')}
+                  </tr>
+                  <tr>
+                    <th>Controls</th>
+                    ${products.map(p => `<td>${p.controls || p.os || 'Electronic Controls'}</td>`).join('')}
+                  </tr>
+                  <tr>
+                    <th>Warranty</th>
+                    ${products.map(p => `<td>${p.warranty || 'Tatwa Warranty'}</td>`).join('')}
+                  </tr>
+                `;
+              })()}
               <tr>
                 <th>Action</th>
                 ${products.map(p => `
@@ -3271,6 +3379,16 @@
       if (inspectorRes) {
         inspectorRes.textContent = JSON.stringify(result, null, 2);
       }
+
+      // Direct UI update fallback if SSE is delayed or reconnecting
+      if (result && (result.componentType || result.displayedProducts)) {
+        handleIncomingImages({
+          componentType: result.componentType || 'products',
+          title: result.title,
+          subtitle: result.subtitle || `Triggered: ${payload.action || payload.query || payload.category || 'Appliance Showcase'}`,
+          products: result.displayedProducts || []
+        });
+      }
     } catch (err) {
       console.error('Failed to hit tool endpoint:', err);
       showToast('Error calling tool');
@@ -3588,10 +3706,6 @@
   initVisualizerSettingTool();
   initOrationWidget();
   connectSSE();
-  renderTatwaWelcomeScreen();
-})();
-
-
   // Category Filter Tabs Listener
   const catTabs = document.querySelectorAll('#category-filter-tabs .cat-tab-btn');
   catTabs.forEach(btn => {
@@ -3610,3 +3724,7 @@
       }
     });
   });
+
+
+  renderTatwaWelcomeScreen();
+})();
