@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 400" width="100%" height="100%" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="waveGradElectric" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0a192f" stop-opacity="0" />
+      <stop offset="15%" stop-color="#1e1b4b" stop-opacity="0.5" />
+      <stop offset="35%" stop-color="#1A6BFF" stop-opacity="0.9" />
+      <stop offset="55%" stop-color="#00D2FF" stop-opacity="1" />
+      <stop offset="75%" stop-color="#4338ca" stop-opacity="0.85" />
+      <stop offset="90%" stop-color="#6366f1" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#050814" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="waveGradCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#050814" stop-opacity="0" />
+      <stop offset="25%" stop-color="#1A6BFF" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#00F5FF" stop-opacity="0.95" />
+      <stop offset="70%" stop-color="#38bdf8" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#050814" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="waveGradViolet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#050814" stop-opacity="0" />
+      <stop offset="30%" stop-color="#312e81" stop-opacity="0.6" />
+      <stop offset="60%" stop-color="#6366f1" stop-opacity="0.75" />
+      <stop offset="85%" stop-color="#818cf8" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#050814" stop-opacity="0" />
+    </linearGradient>
+    <filter id="waveGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#waveGlow)" opacity="0.85">
+    <!-- Fluid Wave Ribbons -->
+    <path d="M-50,220 C250,330 450,110 800,210 C1150,310 1350,130 1650,230" fill="none" stroke="url(#waveGradElectric)" stroke-width="12" opacity="0.35" />
+    <path d="M-50,215 C240,320 460,115 800,205 C1140,295 1360,135 1650,225" fill="none" stroke="url(#waveGradCyan)" stroke-width="4.5" opacity="0.7" />
+    <path d="M-50,210 C230,310 470,120 800,200 C1130,280 1370,140 1650,220" fill="none" stroke="url(#waveGradElectric)" stroke-width="2.5" opacity="0.9" />
+    <path d="M-50,205 C260,305 480,125 800,195 C1120,265 1380,145 1650,215" fill="none" stroke="#00F5FF" stroke-width="1.8" opacity="0.95" />
+    <path d="M-50,200 C270,300 490,130 800,190 C1110,250 1390,150 1650,210" fill="none" stroke="url(#waveGradViolet)" stroke-width="2.2" opacity="0.85" />
+
+    <!-- Secondary Harmonic Ribbon -->
+    <path d="M-50,235 C280,140 520,280 820,180 C1120,80 1380,260 1650,170" fill="none" stroke="url(#waveGradViolet)" stroke-width="8" opacity="0.25" />
+    <path d="M-50,230 C270,145 530,275 820,185 C1110,95 1370,255 1650,175" fill="none" stroke="url(#waveGradElectric)" stroke-width="3" opacity="0.6" />
+    <path d="M-50,225 C260,150 540,270 820,190 C1100,110 1360,250 1650,180" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.85" />
+    <path d="M-50,220 C250,155 550,265 820,195 C1090,125 1350,245 1650,185" fill="none" stroke="url(#waveGradCyan)" stroke-width="2" opacity="0.75" />
+
+    <!-- Tertiary Flow Lines (Multi-layered soundwave strands) -->
+    <path d="M-50,190 C220,290 440,90 800,180 C1160,270 1340,110 1650,200" fill="none" stroke="url(#waveGradElectric)" stroke-width="1.2" opacity="0.5" />
+    <path d="M-50,185 C210,285 430,95 800,175 C1170,255 1330,115 1650,195" fill="none" stroke="#60a5fa" stroke-width="0.9" opacity="0.65" />
+    <path d="M-50,180 C200,280 420,100 800,170 C1180,240 1320,120 1650,190" fill="none" stroke="#00D2FF" stroke-width="0.7" opacity="0.8" />
+  </g>
+</svg>

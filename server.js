@@ -84,6 +84,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root redirects directly to Visualizer Screen
+app.get('/', (req, res) => {
+  res.redirect('/visualizer/');
+});
+
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/visualizer', express.static(path.join(__dirname, 'public', 'visualizer')));
@@ -106,6 +111,9 @@ function getSessionRoom(sessionId = 'default') {
 
 function broadcastToSession(sessionId, payload) {
   const room = getSessionRoom(sessionId);
+  if (!payload.timestamp) {
+    payload.timestamp = new Date().toISOString();
+  }
   room.lastPayload = payload;
 
   const dataStr = JSON.stringify(payload);
@@ -321,21 +329,21 @@ wss.on('connection', (ws, request) => {
   });
 });
 
-// Root route redirect to /visualizer/
+// Root route serves Tatwa Electronics Home Screen / Home Window
 app.get('/', (req, res) => {
-  res.redirect('/visualizer/');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start listening
 server.listen(PORT, () => {
   console.log(`\n==========================================================`);
-  console.log(`⚡ TATWA ELECTRONICS APPLIANCE VISUALIZER BACKEND`);
+  console.log(`⚡ TATWA ELECTRONICS APPLIANCE VISUALIZER & WEBHOOK HUB`);
   console.log(`==========================================================`);
-  console.log(`🌐 Server running locally at: http://localhost:${PORT}`);
-  console.log(`✨ Visualizer Interface:       http://localhost:${PORT}/visualizer/`);
-  console.log(`📡 SSE Stream:                http://localhost:${PORT}/api/stream/default`);
+  console.log(`🏠 Home Window Portal:        http://localhost:${PORT}/`);
+  console.log(`✨ AI Visualizer Studio:       http://localhost:${PORT}/visualizer/`);
+  console.log(`🛠️ Oration AI Tool Webhook:   http://localhost:${PORT}/api/tool`);
+  console.log(`📡 SSE Stream:                http://localhost:${PORT}/api/stream/:sessionId`);
   console.log(`⚡ WebSocket Stream:          ws://localhost:${PORT}/api/ws?sessionId=default`);
-  console.log(`🛠️ Tool Endpoint:             http://localhost:${PORT}/api/tool`);
   console.log(`🏷️ Catalog (20 Appliances):    http://localhost:${PORT}/api/products`);
   console.log(`==========================================================\n`);
 });

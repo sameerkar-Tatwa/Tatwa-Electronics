@@ -2,13 +2,945 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=/visualizer/" />
-  <title>Tatwa Electronics AI Visualizer</title>
-  <script>
-    window.location.replace('/visualizer/');
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tatwa Electronics - Smart Home Appliances & Voice AI Studio</title>
+  <meta name="description" content="Discover Tatwa Electronics next-generation smart home appliances with interactive Voice AI visualizer powered by OmniAgent and Oration AI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border-subtle: #e2e8f0;
+      --brand-blue: #1A6BFF;
+      --brand-blue-hover: #0055FF;
+      --brand-cyan: #00D2FF;
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Bar: Scaled Deep Blue Tech Header */
+    .portal-navbar {
+      height: 56px;
+      background: linear-gradient(135deg, #070d1e 0%, #0c152e 45%, #162447 100%);
+      border-bottom: 1px solid rgba(0, 210, 255, 0.28);
+      box-shadow: 0 2px 14px rgba(0, 102, 255, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .nav-logo-img {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-brand-badge {
+      background: rgba(0, 210, 255, 0.14);
+      color: #00D2FF;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      border-radius: 9999px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .btn-launch-visualizer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1A6BFF;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(26, 107, 255, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-launch-visualizer:hover {
+      background: #0055FF;
+      box-shadow: 0 4px 16px rgba(26, 107, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      background: radial-gradient(ellipse 90% 70% at 50% -10%, #172554 0%, #090e1e 60%, #030611 100%);
+      color: #ffffff;
+      padding: 5rem 2rem 5.5rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-ambient-glow {
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 210, 255, 0.22) 0%, rgba(26, 107, 255, 0.12) 50%, transparent 80%);
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-kicker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      border-radius: 9999px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #00D2FF;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: 3.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-lead {
+      font-size: 1.12rem;
+      color: #94a3b8;
+      max-width: 720px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.6;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1A6BFF;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 26px;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(26, 107, 255, 0.45);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-hero-primary:hover {
+      background: #0055FF;
+      box-shadow: 0 6px 28px rgba(26, 107, 255, 0.65);
+      transform: translateY(-2px);
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 22px;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(0, 210, 255, 0.4);
+      color: #00D2FF;
+      transform: translateY(-2px);
+    }
+
+    /* KPI Metrics Ribbon */
+    .kpi-metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 1.5rem 1.75rem;
+      max-width: 860px;
+      margin: 0 auto;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .kpi-item {
+      text-align: center;
+    }
+
+    .kpi-val {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #00D2FF;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .kpi-label {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4.5rem 1.5rem;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 3rem;
+    }
+
+    .section-kicker {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #1A6BFF;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+    }
+
+    /* Category Cards Grid */
+    .category-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4.5rem;
+    }
+
+    .cat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .cat-card:hover {
+      border-color: #1A6BFF;
+      box-shadow: 0 16px 36px rgba(26, 107, 255, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .cat-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .cat-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .cat-desc {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex: 1 1 auto;
+    }
+
+    .cat-bullets {
+      list-style: none;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .cat-bullets li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cat-bullets li::before {
+      content: '✓';
+      color: #10b981;
+      font-weight: 700;
+    }
+
+    .cat-btn-launch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #f1f5f9;
+      color: #1A6BFF;
+      text-decoration: none;
+      padding: 9px 16px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1px solid #e2e8f0;
+      transition: all 0.15s ease;
+    }
+
+    .cat-btn-launch:hover {
+      background: #1A6BFF;
+      color: #ffffff;
+      border-color: #1A6BFF;
+      box-shadow: 0 4px 12px rgba(26, 107, 255, 0.3);
+    }
+
+    /* Architecture & Integration Section */
+    .arch-card {
+      background: linear-gradient(135deg, #090e1d 0%, #0d162d 100%);
+      color: #ffffff;
+      border-radius: 24px;
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      padding: 3rem 2.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      margin-bottom: 4.5rem;
+    }
+
+    .arch-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .arch-header h3 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: #ffffff;
+    }
+
+    .arch-header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .arch-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .arch-step-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem 1.25rem;
+      position: relative;
+    }
+
+    .arch-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #1A6BFF;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .arch-step-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.35rem;
+    }
+
+    .arch-step-desc {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+
+    /* Webhook URL Copy Box */
+    .webhook-box-wrapper {
+      background: rgba(2, 6, 23, 0.75);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 16px;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .webhook-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .webhook-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #00D2FF;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .webhook-url-code {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .btn-copy-webhook {
+      background: #1A6BFF;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-copy-webhook:hover {
+      background: #0055FF;
+      box-shadow: 0 4px 14px rgba(26, 107, 255, 0.5);
+    }
+
+    /* Quick Launcher Presets */
+    .presets-section {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 2.75rem 2.25rem;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+      margin-bottom: 4.5rem;
+    }
+
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .preset-link-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .preset-link-card:hover {
+      background: #ffffff;
+      border-color: #1A6BFF;
+      box-shadow: 0 6px 18px rgba(26, 107, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .preset-icon {
+      font-size: 1.4rem;
+    }
+
+    .preset-info strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .preset-info span {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .portal-footer {
+      background: #050811;
+      color: #94a3b8;
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand img {
+      height: 22px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover {
+      color: #00D2FF;
+    }
+
+    .footer-copy {
+      font-size: 0.76rem;
+      color: #64748b;
+    }
+
+    @media (max-width: 900px) {
+      .hero-headline { font-size: 2.25rem; }
+      .kpi-metrics-strip { grid-template-columns: repeat(2, 1fr); }
+      .arch-steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0b1120; color: #f8fafc;">
-  <p>Redirecting to <a href="/visualizer/" style="color: #00D2FF; font-weight: bold;">Tatwa Electronics AI Visualizer</a>...</p>
+<body>
+
+  <!-- Top Navigation Bar: Scaled Deep Blue Tech Header -->
+  <header class="portal-navbar">
+    <a href="/" class="nav-brand">
+      <img src="visualizer/images/tatwa_logo_white.svg" alt="Tatwa Electronics" class="nav-logo-img" />
+      <span class="nav-brand-badge">SMART LIVING</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#appliances" class="nav-link">Appliances (20)</a>
+      <a href="#voice-ai" class="nav-link">Voice AI Engine</a>
+      <a href="#quick-launch" class="nav-link">Studio Demos</a>
+      <a href="visualizer/" class="nav-link">Open Visualizer</a>
+    </nav>
+
+    <div class="nav-right-actions">
+      <a href="visualizer/" class="btn-launch-visualizer">
+        <span>✨ Launch Studio</span>
+        <span>→</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-ambient-glow" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-kicker-pill">
+        <span>⚡ TATWA ELECTRONICS × OMNIAGENT AI</span>
+      </div>
+      <h1 class="hero-headline">
+        Intelligent Living.<br />Effortless Voice Control.
+      </h1>
+      <p class="hero-lead">
+        Experience Tatwa's next-generation smart home appliances. Seamlessly discover, compare, and operate 20 verified models through conversational Voice AI in Hindi and English.
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="visualizer/" class="btn-hero-primary">
+          <span>✨ Launch AI Visualizer Studio</span>
+          <span>→</span>
+        </a>
+        <a href="visualizer/?mode=voice" class="btn-hero-secondary">
+          <span>🎙️ Start Voice AI Demo</span>
+        </a>
+        <a href="#voice-ai" class="btn-hero-secondary">
+          <span>🛠️ Webhook Tool Specs</span>
+        </a>
+      </div>
+
+      <!-- KPI Metrics Strip -->
+      <div class="kpi-metrics-strip">
+        <div class="kpi-item">
+          <div class="kpi-val">20</div>
+          <div class="kpi-label">Verified Appliances</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-val">&lt; 100ms</div>
+          <div class="kpi-label">Voice Sync Latency</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-val">12-Yr</div>
+          <div class="kpi-label">BLDC Motor Warranty</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-val">4</div>
+          <div class="kpi-label">Product Categories</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Showcase Container -->
+  <main class="container">
+
+    <!-- Categories Section -->
+    <section id="appliances">
+      <div class="section-header">
+        <div class="section-kicker">Product Ecosystem</div>
+        <h2 class="section-title">Engineered for Indian Homes</h2>
+        <p class="section-desc">Explore Tatwa's premium catalog of smart kitchen, home, and entertainment appliances.</p>
+      </div>
+
+      <div class="category-cards-grid">
+        <!-- 1. Chimneys -->
+        <div class="cat-card">
+          <div class="cat-icon-box">🌪️</div>
+          <h3 class="cat-title">Smart BLDC Chimneys</h3>
+          <p class="cat-desc">High-power 1500 m³/hr suction with thermal auto-clean and touchless gesture wave controls.</p>
+          <ul class="cat-bullets">
+            <li>150W Inverter BLDC Motor</li>
+            <li>Wave Hand Gesture Sensors</li>
+            <li>Heat Auto-Clean Oil Collector</li>
+          </ul>
+          <a href="visualizer/?category=chimney" class="cat-btn-launch">Explore 3 Chimneys →</a>
+        </div>
+
+        <!-- 2. Dishwashers -->
+        <div class="cat-card">
+          <div class="cat-icon-box">🍽️</div>
+          <h3 class="cat-title">Hygiene Dishwashers</h3>
+          <p class="cat-desc">Engineered for oily kadhais and pressure cookers with intensive 70°C sanitization.</p>
+          <ul class="cat-bullets">
+            <li>12S to 16S Capacities</li>
+            <li>3D Cyclone Spray Arms</li>
+            <li>Built-in Water Softener Chamber</li>
+          </ul>
+          <a href="visualizer/?category=dishwasher" class="cat-btn-launch">Explore 10 Dishwashers →</a>
+        </div>
+
+        <!-- 3. Washing Machines -->
+        <div class="cat-card">
+          <div class="cat-icon-box">🌀</div>
+          <h3 class="cat-title">AI Inverter Washers</h3>
+          <p class="cat-desc">Direct drive inverter motor with AI fabric sensing and steam allergy care cycle.</p>
+          <ul class="cat-bullets">
+            <li>6.5kg to 10kg Capacities</li>
+            <li>1400 RPM High-Speed Spin</li>
+            <li>Steam Wash 99.9% Allergy Clean</li>
+          </ul>
+          <a href="visualizer/?category=washing_machine" class="cat-btn-launch">Explore 4 Washers →</a>
+        </div>
+
+        <!-- 4. Smart TVs -->
+        <div class="cat-card">
+          <div class="cat-icon-box">📺</div>
+          <h3 class="cat-title">Cinema Vision 4K TVs</h3>
+          <p class="cat-desc">Ultra-vibrant 4K QLED and Cinema OLED with 144Hz VRR gaming and Dolby Atmos audio.</p>
+          <ul class="cat-bullets">
+            <li>43", 55", and 65" Displays</li>
+            <li>144 Hz Native Gaming VRR</li>
+            <li>Google TV with Far-Field Mic</li>
+          </ul>
+          <a href="visualizer/?category=tv" class="cat-btn-launch">Explore 3 Smart TVs →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture & Oration Voice Webhook Section -->
+    <section id="voice-ai" class="arch-card">
+      <div class="arch-header">
+        <div class="hero-kicker-pill" style="margin-bottom: 0.8rem;">
+          <span>🎙️ ORATION AI × TATWA WEBHOOK TOOL</span>
+        </div>
+        <h3>How Voice Control Works in Real Time</h3>
+        <p>A resilient, sub-100ms decoupled architecture connecting caller voice requests to the visualizer canvas.</p>
+      </div>
+
+      <div class="arch-steps-grid">
+        <div class="arch-step-box">
+          <div class="arch-step-num">1</div>
+          <div class="arch-step-title">Customer Speaks</div>
+          <div class="arch-step-desc">Natural Hindi or English: <em>"30000 ke andar dishwasher aur chimney dikhao"</em>.</div>
+        </div>
+
+        <div class="arch-step-box">
+          <div class="arch-step-num">2</div>
+          <div class="arch-step-title">Oration Tool Call</div>
+          <div class="arch-step-desc">Voice Agent executes <code>display_tatwa_products</code> via Webhook HTTP POST.</div>
+        </div>
+
+        <div class="arch-step-box">
+          <div class="arch-step-num">3</div>
+          <div class="arch-step-title">Catalog Resolver</div>
+          <div class="arch-step-desc">Backend matches 20 Tatwa appliances, prices, discounts, and blueprints.</div>
+        </div>
+
+        <div class="arch-step-box">
+          <div class="arch-step-num">4</div>
+          <div class="arch-step-title">Instant Live Sync</div>
+          <div class="arch-step-desc">Server streams payload via SSE & WebSocket directly to caller screen.</div>
+        </div>
+      </div>
+
+      <!-- Copyable Webhook URL -->
+      <div class="webhook-box-wrapper">
+        <div class="webhook-details">
+          <span class="webhook-tag">Oration AI Webhook Tool Endpoint (POST)</span>
+          <span class="webhook-url-code" id="webhook-url-text">http://localhost:3000/api/tool</span>
+        </div>
+        <button class="btn-copy-webhook" id="btn-copy-webhook-url" title="Copy Webhook URL">
+          <span>📋 Copy Endpoint</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Demos & Pre-Configured States -->
+    <section id="quick-launch" class="presets-section">
+      <div class="section-header" style="margin-bottom: 1.5rem;">
+        <div class="section-kicker">Instant Visualizer States</div>
+        <h2 class="section-title">One-Click Feature Launchers</h2>
+        <p class="section-desc">Launch directly into interactive visualizer states, comparisons, and guides.</p>
+      </div>
+
+      <div class="presets-grid">
+        <a href="visualizer/?action=compare_tvs" class="preset-link-card">
+          <span class="preset-icon">📊</span>
+          <div class="preset-info">
+            <strong>TV Comparison Matrix</strong>
+            <span>Side-by-side 4K QLED vs OLED</span>
+          </div>
+        </a>
+
+        <a href="visualizer/?maxPrice=30000&category=dishwasher" class="preset-link-card">
+          <span class="preset-icon">🏷️</span>
+          <div class="preset-info">
+            <strong>Dishwashers Under ₹30k</strong>
+            <span>PureWash FFSD 12S Neo Black</span>
+          </div>
+        </a>
+
+        <a href="visualizer/?action=installation" class="preset-link-card">
+          <span class="preset-icon">🛠️</span>
+          <div class="preset-info">
+            <strong>Installation Blueprint</strong>
+            <span>4-Stage Duct & Bracket Guide</span>
+          </div>
+        </a>
+
+        <a href="visualizer/?action=bldc_motor" class="preset-link-card">
+          <span class="preset-icon">⚡</span>
+          <div class="preset-info">
+            <strong>BLDC Motor & 12-Yr Warranty</strong>
+            <span>Inverter Technology Video</span>
+          </div>
+        </a>
+
+        <a href="visualizer/?action=washing_machine_guide" class="preset-link-card">
+          <span class="preset-icon">🧺</span>
+          <div class="preset-info">
+            <strong>AI Steam Fabric Guide</strong>
+            <span>Wool, BabyCare & Allergen Wash</span>
+          </div>
+        </a>
+
+        <a href="visualizer/?category=all" class="preset-link-card">
+          <span class="preset-icon">👁️</span>
+          <div class="preset-info">
+            <strong>All 20 Tatwa Models</strong>
+            <span>Complete verified catalog</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="portal-footer">
+    <div class="footer-brand">
+      <img src="visualizer/images/tatwa_logo_white.svg" alt="Tatwa Electronics" />
+    </div>
+    <div class="footer-links">
+      <a href="visualizer/">Visualizer Studio</a>
+      <a href="api/products" target="_blank">Product Catalog API (JSON)</a>
+      <a href="api/health" target="_blank">Health Check Endpoint</a>
+      <a href="visualizer/?mode=controls">Simulator &amp; Settings</a>
+    </div>
+    <p class="footer-copy">
+      &copy; 2026 Tatwa Electronics &bull; Powered by OmniAgent &amp; Oration AI &bull; All Rights Reserved.
+    </p>
+  </footer>
+
+  <script>
+    // Dynamically update webhook URL display with current origin
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlText = document.getElementById('webhook-url-text');
+      const copyBtn = document.getElementById('btn-copy-webhook-url');
+      const origin = window.location.origin;
+      const fullWebhookUrl = `${origin}/api/tool`;
+      
+      if (urlText) {
+        urlText.textContent = fullWebhookUrl;
+      }
+
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(fullWebhookUrl);
+            copyBtn.innerHTML = '<span>✅ Copied!</span>';
+            setTimeout(() => {
+              copyBtn.innerHTML = '<span>📋 Copy Endpoint</span>';
+            }, 2000);
+          } catch (_) {
+            prompt('Copy Webhook URL:', fullWebhookUrl);
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>

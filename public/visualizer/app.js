@@ -382,6 +382,7 @@
               border-radius: 0 !important;
               border: none !important;
               background: #ffffff !important;
+              color: #0f172a !important;
               box-shadow: none !important;
               margin: 0 !important;
               overflow: hidden !important;
@@ -440,8 +441,8 @@
               flex-shrink: 0 !important;
               margin-top: auto !important;
               padding-top: 0.75rem !important;
-              border-top: 1px solid #f1f5f9 !important;
               background: #ffffff !important;
+              border-top: 1px solid #e2e8f0 !important;
             }
 
             /* Centered Start / Call Button when Idle */
@@ -670,7 +671,7 @@
       activeEventSource.close();
     }
 
-    const sseUrl = `${backendUrl}/api/stream/default`;
+    const sseUrl = `${backendUrl}/api/stream/${encodeURIComponent(sessionId)}`;
 
     try {
       activeEventSource = new EventSource(sseUrl);
@@ -721,180 +722,712 @@
   }
 
   
-  // Component: Washing Machine Fabric & Cycle Guide
-  function renderWashingMachineGuide(container, guideData) {
+  // ==========================================================================
+  // COMPONENT: WASHING MACHINE FABRIC CARE & STEAM WASH GUIDE (WITH RICH IMAGERY)
+  // ==========================================================================
+  function renderWashingMachineGuide(container) {
     if (!container) return;
     prepareViewTransition(container);
-    const data = guideData || {
-      title: 'Tatwa EcoWash Smart Fabric & Program Guide',
-      subtitle: 'Optimized wash settings, steam sanitization and load management for everyday laundry',
-      imageUrl: 'images/wm_front_load_8kg.jpg',
-      sections: [
-        {
-          rackName: 'AI Steam Allergy Care (60°C – 90°C)',
-          icon: '♨️',
-          items: 'Baby clothes, bedsheets, towels, sensitive skin garments',
-          rules: [
-            'Heats water into pure micro-steam penetrating deep fabric weaves to eradicate 99.9% dust mites and bacteria.',
-            'Reduces stubborn wrinkles by up to 30%, making ironing effortless.',
-            'Always separate delicate silks and woolens before running steam cycles.'
-          ]
-        },
-        {
-          rackName: 'Cotton & Heavy Daily Loads',
-          icon: '👕',
-          items: 'Denim jeans, shirts, cotton trousers, kurtas',
-          rules: [
-            'Load up to 80% capacity for optimal drum agitation and water saturation.',
-            'Use the 1400 RPM spin speed to extract maximum moisture, cutting drying time in half.',
-            'Pour liquid detergent in Compartment II; add fabric softener in the flower-marked center slot.'
-          ]
-        },
-        {
-          rackName: 'Delicates & Quick 15m Refresh',
-          icon: '✨',
-          items: 'Activewear, gym clothes, lightly soiled daily tees, synthetic blends',
-          rules: [
-            'Use Quick 15 for up to 2 kg lightly soiled clothes to save 70% electricity and water.',
-            'Turn printed tees and zip jackets inside-out to prevent fabric friction.'
-          ]
-        }
-      ]
-    };
+
+    if (displaySubtitle) {
+      displaySubtitle.textContent = 'AI Direct Drive Inverter • 99.9% Steam Allergy Care • 1400 RPM Spin';
+    }
 
     container.innerHTML = `
-      <div class="manual-guide-container">
-        <div class="manual-header-banner">
-          <div>
-            <div class="guide-badge-pill">🧺 Washing Machine Guide</div>
-            <h3 class="manual-headline">${data.title}</h3>
-            <p class="manual-subhead">${data.subtitle}</p>
-          </div>
-        </div>
-
-        <div class="manual-sections-grid">
-          ${data.sections.map((sec, idx) => `
-            <div class="manual-phase-card">
-              <div class="phase-badge-row">
-                <span class="phase-number-pill">CYCLE ${idx + 1}</span>
-                <span class="phase-icon">${sec.icon}</span>
-              </div>
-              <h4 class="phase-title">${sec.rackName}</h4>
-              <p class="phase-desc" style="font-weight:600; color:#0284c7; margin-bottom:0.5rem;">${sec.items}</p>
-              <ul class="phase-points-list">
-                ${sec.rules.map(r => `<li>${r}</li>`).join('')}
-              </ul>
+      <div class="installation-guide-card" id="washing-machine-guide-comp">
+        <header class="guide-header">
+          <div class="brand-title-group">
+            <button class="btn-back-home-pill" id="btn-back-wm-guide" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
             </div>
-          `).join('')}
-        </div>
+            <h1 class="main-title">SMART FABRIC CARE &amp; STEAM WASH GUIDE</h1>
+            <div class="sub-title">AI DIRECT DRIVE • STEAM ALLERGEN SANITIZATION • 1400 RPM</div>
+          </div>
+
+          <div class="playback-controls">
+            <button id="btn-toggle-wm-cycle" class="btn-auto-play-toggle" title="Pause or Resume Auto Cycle">
+              <span id="cycle-icon-wm">⏸</span>
+              <span id="cycle-text-wm">Auto Cycle Active</span>
+            </button>
+          </div>
+
+          <nav class="steps-nav-tracker" aria-label="Washing Machine Cycles">
+            <div class="step-nav-item active" data-step="1">
+              <div class="step-circle">1</div>
+              <span class="step-label">Steam Care</span>
+            </div>
+            <div class="step-nav-item" data-step="2">
+              <div class="step-circle">2</div>
+              <span class="step-label">Cotton Loads</span>
+            </div>
+            <div class="step-nav-item" data-step="3">
+              <div class="step-circle">3</div>
+              <span class="step-label">Delicates / 15m</span>
+            </div>
+            <div class="step-nav-item" data-step="4">
+              <div class="step-circle">4</div>
+              <span class="step-label">Direct Drive</span>
+            </div>
+          </nav>
+        </header>
+
+        <main class="installation-canvas">
+          <div class="steps-column">
+            <article class="step-card active" id="wm-step-card-1" data-step="1">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">01</span>
+                  <h2 class="step-heading">AI STEAM ALLERGY CARE (60°C–90°C)</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>Inbuilt heater generates micro-steam penetrating deep fabric weaves.</li>
+                  <li>Eradicates 99.9% dust mites, bacteria, and allergen particles.</li>
+                  <li>Smooths stubborn wrinkles, reducing daily ironing effort by 30%.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Steam Allergy Wash Image">
+                <img src="images/wm_front_load_8kg.jpg" alt="Front Load Steam Wash" />
+              </div>
+            </article>
+
+            <article class="step-card" id="wm-step-card-2" data-step="2">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">02</span>
+                  <h2 class="step-heading">COTTON &amp; HEAVY DAILY LOADS</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>Load up to 80% drum capacity for optimal water circulation.</li>
+                  <li>1400 RPM high spin speed extracts maximum moisture from jeans &amp; bedsheets.</li>
+                  <li>Dual dispenser for liquid detergent and fabric softener.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Cotton Heavy Load Image">
+                <img src="images/wm_washer_dryer_10kg.jpg" alt="Washer Dryer Combo" />
+              </div>
+            </article>
+          </div>
+
+          <div class="hero-center-column">
+            <div class="hero-chimney-img-box">
+              <img src="images/wm_front_load_8kg.jpg" alt="Tatwa Smart Washing Machine Architecture" />
+              <div class="hero-pointer-tag pointer-pos-01 active" id="wm-pointer-01" data-step="1" title="01: Micro-Steam Chamber (90°C)">01</div>
+              <div class="hero-pointer-tag pointer-pos-02" id="wm-pointer-02" data-step="2" title="02: Direct Motion Inverter Motor">02</div>
+              <div class="hero-pointer-tag pointer-pos-03" id="wm-pointer-03" data-step="3" title="03: Antibacterial Gasket &amp; Lifters">03</div>
+              <div class="hero-pointer-tag pointer-pos-04" id="wm-pointer-04" data-step="4" title="04: AI Smart Fabric Sensing Drum">04</div>
+            </div>
+          </div>
+
+          <div class="steps-column">
+            <article class="step-card" id="wm-step-card-3" data-step="3">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">03</span>
+                  <h2 class="step-heading">DELICATES &amp; QUICK 15M REFRESH</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>15-minute express cycle for up to 2 kg lightly soiled daily clothes.</li>
+                  <li>Saves up to 70% electricity and water on quick everyday washes.</li>
+                  <li>Gentle drum wave rotation protects silks, activewear, and lace.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Quick 15m Delicate Wash Image">
+                <img src="images/wm_top_load_75kg.jpg" alt="Top Load Smart Washer" />
+              </div>
+            </article>
+
+            <article class="step-card" id="wm-step-card-4" data-step="4">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">04</span>
+                  <h2 class="step-heading">DIRECT DRIVE INVERTER MOTOR</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>Beltless motor attached directly to the drum eliminating slippage.</li>
+                  <li>Operates whisper-quiet under 52 dB during high-speed spinning.</li>
+                  <li>10-Year motor warranty with 5-Star BEE maximum energy savings.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Inverter Direct Drive Motor Image">
+                <img src="images/wm_semi_automatic_65kg.jpg" alt="Direct Motion Motor" />
+              </div>
+            </article>
+          </div>
+        </main>
+
+        <footer class="guide-bottom-strip">
+          <div class="bottom-info-card">
+            <div class="bottom-card-icon">♨️</div>
+            <div class="bottom-card-text">
+              <span class="bottom-card-title">Inbuilt Thermal Heater</span>
+              <p class="bottom-card-desc">Heats water up to 90°C to tackle oily food stains, turmeric, and tough Indian curry marks.</p>
+            </div>
+          </div>
+
+          <div class="bottom-info-card">
+            <div class="bottom-card-icon">⚡</div>
+            <div class="bottom-card-text">
+              <span class="bottom-card-title">Direct Motion Inverter</span>
+              <p class="bottom-card-desc">Frictionless electromagnetic drive cuts vibration and power consumption by up to 45%.</p>
+            </div>
+          </div>
+
+          <div class="bottom-notice-card">
+            <div class="notice-shield-icon">🛡️</div>
+            <div class="notice-card-text">
+              <span class="notice-card-title">10-Year Motor Warranty</span>
+              <p class="notice-card-desc">2 Years comprehensive warranty + 10 Years on Inverter motor with free doorstep technician visits.</p>
+            </div>
+          </div>
+        </footer>
       </div>
     `;
+
+    // Back to home listener
+    const btnBack = container.querySelector('#btn-back-wm-guide');
+    if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
+
+    initWMStepCycle(container);
   }
 
-  // Component: TV Cinema Display Guide
-  function renderTVDisplayGuide(container, guideData) {
+  function initWMStepCycle(container) {
+    if (!container) return;
+    let currentStep = 1;
+    const totalSteps = 4;
+    let autoPlay = true;
+    let cycleTimer = null;
+    const cycleIntervalMs = 3800;
+
+    const navItems = container.querySelectorAll('.step-nav-item');
+    const stepCards = container.querySelectorAll('.step-card');
+    const pointerTags = container.querySelectorAll('.hero-pointer-tag');
+    const btnToggle = container.querySelector('#btn-toggle-wm-cycle');
+    const cycleIcon = container.querySelector('#cycle-icon-wm');
+    const cycleText = container.querySelector('#cycle-text-wm');
+
+    function setActiveStep(stepNum) {
+      currentStep = Number(stepNum);
+
+      navItems.forEach((nav) => {
+        const s = Number(nav.getAttribute('data-step'));
+        nav.classList.toggle('active', s === currentStep);
+      });
+
+      stepCards.forEach((card) => {
+        const s = Number(card.getAttribute('data-step'));
+        card.classList.toggle('active', s === currentStep);
+      });
+
+      pointerTags.forEach((pt) => {
+        const s = Number(pt.getAttribute('data-step'));
+        pt.classList.toggle('active', s === currentStep);
+      });
+    }
+
+    navItems.forEach((nav) => {
+      nav.addEventListener('click', () => {
+        const s = nav.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    stepCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const s = card.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    pointerTags.forEach((pt) => {
+      pt.addEventListener('click', () => {
+        const s = pt.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    function startAutoCycle() {
+      if (cycleTimer) clearInterval(cycleTimer);
+      cycleTimer = setInterval(() => {
+        if (!autoPlay) return;
+        currentStep = (currentStep % totalSteps) + 1;
+        setActiveStep(currentStep);
+      }, cycleIntervalMs);
+    }
+
+    function stopAutoCycle() {
+      if (cycleTimer) {
+        clearInterval(cycleTimer);
+        cycleTimer = null;
+      }
+    }
+
+    function resetAutoCycle() {
+      stopAutoCycle();
+      if (autoPlay) startAutoCycle();
+    }
+
+    if (btnToggle) {
+      btnToggle.addEventListener('click', () => {
+        autoPlay = !autoPlay;
+        if (autoPlay) {
+          if (cycleIcon) cycleIcon.textContent = '⏸';
+          if (cycleText) cycleText.textContent = 'Auto Cycle Active';
+          startAutoCycle();
+        } else {
+          if (cycleIcon) cycleIcon.textContent = '▶';
+          if (cycleText) cycleText.textContent = 'Cycle Paused';
+          stopAutoCycle();
+        }
+      });
+    }
+
+    startAutoCycle();
+  }
+
+  // ==========================================================================
+  // COMPONENT: SMART TV DISPLAY & AUDIO CALIBRATION GUIDE (WITH RICH IMAGERY)
+  // ==========================================================================
+  function renderTVDisplayGuide(container) {
     if (!container) return;
     prepareViewTransition(container);
-    const data = guideData || {
-      title: 'Tatwa Cinema Display & Audio Calibration Guide',
-      subtitle: 'Unlocking 4K QLED, OLED Infinite Contrast & Dolby Atmos immersive home theater',
-      imageUrl: 'images/tv_oled_65inch.jpg',
-      sections: [
-        {
-          rackName: 'Quantum Dot QLED vs OLED Contrast',
-          icon: '📺',
-          items: 'Brightness, Color Volume, Black Levels, Viewing Angles',
-          rules: [
-            'QLED (Tatwa Vision Pro): Uses Quantum Dots for ultra-high 1000+ nits peak brightness, ideal for bright sunlit Indian living rooms.',
-            'OLED (Tatwa CrystalView): 8.3 million self-lit individual pixels provide perfect absolute black, infinite contrast ratio, and wide 178° viewing angles.'
-          ]
-        },
-        {
-          rackName: 'Dolby Atmos & Audio Tuning',
-          icon: '🔊',
-          items: 'Voice Clarity, Virtual Surround, eARC Passthrough',
-          rules: [
-            'Enable Dialogue Enhancer for crisp, audible movie dialogues without raising overall volume.',
-            'Use HDMI Port 1 (eARC 2.1) when connecting high-end home theater AVRs or external subwoofers.'
-          ]
-        }
-      ]
-    };
+
+    if (displaySubtitle) {
+      displaySubtitle.textContent = '4K QLED & OLED Calibration • 144Hz Native Gaming VRR • Dolby Atmos 60W Audio';
+    }
 
     container.innerHTML = `
-      <div class="manual-guide-container">
-        <div class="manual-header-banner">
-          <div>
-            <div class="guide-badge-pill">📺 Smart TV Guide</div>
-            <h3 class="manual-headline">${data.title}</h3>
-            <p class="manual-subhead">${data.subtitle}</p>
-          </div>
-        </div>
-
-        <div class="manual-sections-grid">
-          ${data.sections.map((sec, idx) => `
-            <div class="manual-phase-card">
-              <div class="phase-badge-row">
-                <span class="phase-number-pill">PART ${idx + 1}</span>
-                <span class="phase-icon">${sec.icon}</span>
-              </div>
-              <h4 class="phase-title">${sec.rackName}</h4>
-              <p class="phase-desc" style="font-weight:600; color:#0284c7; margin-bottom:0.5rem;">${sec.items}</p>
-              <ul class="phase-points-list">
-                ${sec.rules.map(r => `<li>${r}</li>`).join('')}
-              </ul>
+      <div class="installation-guide-card" id="tv-guide-comp">
+        <header class="guide-header">
+          <div class="brand-title-group">
+            <button class="btn-back-home-pill" id="btn-back-tv-guide" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
             </div>
-          `).join('')}
-        </div>
+            <h1 class="main-title">TATWA CINEMA DISPLAY &amp; AUDIO CALIBRATION GUIDE</h1>
+            <div class="sub-title">4K QLED &amp; OLED CALIBRATION • 144HZ VRR • DOLBY ATMOS 60W SOUND</div>
+          </div>
+
+          <div class="playback-controls">
+            <button id="btn-toggle-tv-cycle" class="btn-auto-play-toggle" title="Pause or Resume Auto Cycle">
+              <span id="cycle-icon-tv">⏸</span>
+              <span id="cycle-text-tv">Auto Cycle Active</span>
+            </button>
+          </div>
+
+          <nav class="steps-nav-tracker" aria-label="Smart TV Calibration Steps">
+            <div class="step-nav-item active" data-step="1">
+              <div class="step-circle">1</div>
+              <span class="step-label">Quantum QLED</span>
+            </div>
+            <div class="step-nav-item" data-step="2">
+              <div class="step-circle">2</div>
+              <span class="step-label">Cinema OLED</span>
+            </div>
+            <div class="step-nav-item" data-step="3">
+              <div class="step-circle">3</div>
+              <span class="step-label">Dolby Atmos</span>
+            </div>
+            <div class="step-nav-item" data-step="4">
+              <div class="step-circle">4</div>
+              <span class="step-label">144Hz Gaming</span>
+            </div>
+          </nav>
+        </header>
+
+        <main class="installation-canvas">
+          <div class="steps-column">
+            <article class="step-card active" id="tv-step-card-1" data-step="1">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">01</span>
+                  <h2 class="step-heading">QUANTUM DOT QLED DISPLAY</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>1000+ Nits Peak Brightness delivering over 1 Billion true-to-life colors.</li>
+                  <li>Quantum Nanocrystals filter backlight for vivid color in bright sunlit rooms.</li>
+                  <li>AI 4K Upscaler sharpens broadcast cable TV &amp; streaming video.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Quantum QLED Display Image">
+                <img src="images/tv_qled_55inch.jpg" alt="Tatwa 55 inch 4K QLED TV" />
+              </div>
+            </article>
+
+            <article class="step-card" id="tv-step-card-2" data-step="2">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">02</span>
+                  <h2 class="step-heading">CINEMA OLED INFINITE CONTRAST</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>8.3 Million self-illuminating pixels give pure absolute black levels.</li>
+                  <li>Infinite contrast ratio with zero light bleed around white subtitles.</li>
+                  <li>Ultra-wide 178° viewing angle from any sofa angle without color fading.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Cinema OLED Contrast Image">
+                <img src="images/tv_oled_65inch.jpg" alt="Tatwa 65 inch OLED Cinema TV" />
+              </div>
+            </article>
+          </div>
+
+          <div class="hero-center-column">
+            <div class="hero-chimney-img-box">
+              <img src="images/tv_oled_65inch.jpg" alt="Tatwa OLED &amp; QLED Architecture" />
+              <div class="hero-pointer-tag pointer-pos-01 active" id="tv-pointer-01" data-step="1" title="01: Quantum Dot Nanocrystal Layer">01</div>
+              <div class="hero-pointer-tag pointer-pos-02" id="tv-pointer-02" data-step="2" title="02: 8.3M Self-Illuminating OLED Pixels">02</div>
+              <div class="hero-pointer-tag pointer-pos-03" id="tv-pointer-03" data-step="3" title="03: Integrated 60W Dolby Atmos Soundbar">03</div>
+              <div class="hero-pointer-tag pointer-pos-04" id="tv-pointer-04" data-step="4" title="04: 144Hz VRR HDMI 2.1 eARC Port">04</div>
+            </div>
+          </div>
+
+          <div class="steps-column">
+            <article class="step-card" id="tv-step-card-3" data-step="3">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">03</span>
+                  <h2 class="step-heading">DOLBY ATMOS &amp; AUDIO TUNING</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>Built-in 60W soundbar with integrated acoustic subwoofer.</li>
+                  <li>Dialogue Enhancer isolates human speech for crisp vocal clarity.</li>
+                  <li>eARC 2.1 lossless 24-bit audio passthrough to home theater AV receivers.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="Dolby Atmos Soundbar Image">
+                <img src="images/tv_frameless_43inch.jpg" alt="Tatwa Frameless 4K Smart TV" />
+              </div>
+            </article>
+
+            <article class="step-card" id="tv-step-card-4" data-step="4">
+              <div class="step-info-col">
+                <div class="step-title-header">
+                  <span class="step-num-pill">04</span>
+                  <h2 class="step-heading">144HZ NATIVE GAMING VRR</h2>
+                </div>
+                <ul class="step-bullets-list">
+                  <li>144Hz native refresh rate with Variable Refresh Rate (VRR) gaming.</li>
+                  <li>Auto Low Latency Mode (ALLM) delivers under 5ms input lag for consoles.</li>
+                  <li>Hands-free Google TV with far-field voice mic &amp; wireless casting.</li>
+                </ul>
+              </div>
+              <div class="step-square-box" title="144Hz Gaming VRR Image">
+                <img src="images/tv_qled_55inch.jpg" alt="Tatwa Gaming QLED TV" />
+              </div>
+            </article>
+          </div>
+        </main>
+
+        <footer class="guide-bottom-strip">
+          <div class="bottom-info-card">
+            <div class="bottom-card-icon">📺</div>
+            <div class="bottom-card-text">
+              <span class="bottom-card-title">Dolby Vision IQ</span>
+              <p class="bottom-card-desc">Ambient light sensor dynamically optimizes HDR highlights and shadow detail in real-time.</p>
+            </div>
+          </div>
+
+          <div class="bottom-info-card">
+            <div class="bottom-card-icon">🎮</div>
+            <div class="bottom-card-text">
+              <span class="bottom-card-title">HDMI 2.1 eARC Port</span>
+              <p class="bottom-card-desc">Full 48Gbps bandwidth supports uncompressed 4K 144Hz VRR signals from PS5 and PC graphics cards.</p>
+            </div>
+          </div>
+
+          <div class="bottom-notice-card">
+            <div class="notice-shield-icon">🛡️</div>
+            <div class="notice-card-text">
+              <span class="notice-card-title">3-Year Doorstep Panel Warranty</span>
+              <p class="notice-card-desc">Comprehensive panel coverage and complimentary on-site calibration. Helpline: 1800-828-9222.</p>
+            </div>
+          </div>
+        </footer>
       </div>
     `;
+
+    // Back to home listener
+    const btnBack = container.querySelector('#btn-back-tv-guide');
+    if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
+
+    initTVStepCycle(container);
   }
 
-  // Component 0: Tatwa Electronics Official Welcome Screen (Fresh Load & Refresh Default)
+  function initTVStepCycle(container) {
+    if (!container) return;
+    let currentStep = 1;
+    const totalSteps = 4;
+    let autoPlay = true;
+    let cycleTimer = null;
+    const cycleIntervalMs = 3800;
+
+    const navItems = container.querySelectorAll('.step-nav-item');
+    const stepCards = container.querySelectorAll('.step-card');
+    const pointerTags = container.querySelectorAll('.hero-pointer-tag');
+    const btnToggle = container.querySelector('#btn-toggle-tv-cycle');
+    const cycleIcon = container.querySelector('#cycle-icon-tv');
+    const cycleText = container.querySelector('#cycle-text-tv');
+
+    function setActiveStep(stepNum) {
+      currentStep = Number(stepNum);
+
+      navItems.forEach((nav) => {
+        const s = Number(nav.getAttribute('data-step'));
+        nav.classList.toggle('active', s === currentStep);
+      });
+
+      stepCards.forEach((card) => {
+        const s = Number(card.getAttribute('data-step'));
+        card.classList.toggle('active', s === currentStep);
+      });
+
+      pointerTags.forEach((pt) => {
+        const s = Number(pt.getAttribute('data-step'));
+        pt.classList.toggle('active', s === currentStep);
+      });
+    }
+
+    navItems.forEach((nav) => {
+      nav.addEventListener('click', () => {
+        const s = nav.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    stepCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const s = card.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    pointerTags.forEach((pt) => {
+      pt.addEventListener('click', () => {
+        const s = pt.getAttribute('data-step');
+        if (s) {
+          setActiveStep(s);
+          resetAutoCycle();
+        }
+      });
+    });
+
+    function startAutoCycle() {
+      if (cycleTimer) clearInterval(cycleTimer);
+      cycleTimer = setInterval(() => {
+        if (!autoPlay) return;
+        currentStep = (currentStep % totalSteps) + 1;
+        setActiveStep(currentStep);
+      }, cycleIntervalMs);
+    }
+
+    function stopAutoCycle() {
+      if (cycleTimer) {
+        clearInterval(cycleTimer);
+        cycleTimer = null;
+      }
+    }
+
+    function resetAutoCycle() {
+      stopAutoCycle();
+      if (autoPlay) startAutoCycle();
+    }
+
+    if (btnToggle) {
+      btnToggle.addEventListener('click', () => {
+        autoPlay = !autoPlay;
+        if (autoPlay) {
+          if (cycleIcon) cycleIcon.textContent = '⏸';
+          if (cycleText) cycleText.textContent = 'Auto Cycle Active';
+          startAutoCycle();
+        } else {
+          if (cycleIcon) cycleIcon.textContent = '▶';
+          if (cycleText) cycleText.textContent = 'Cycle Paused';
+          stopAutoCycle();
+        }
+      });
+    }
+
+    startAutoCycle();
+  }
+
+  // Component 0: Tatwa Electronics Category Home Screen (Default Right-Pane Landing)
   function renderTatwaWelcomeScreen(container) {
     const target = container || document.getElementById('component-viewport') || productGrid;
     if (!target) return;
     prepareViewTransition(target);
 
     updateDisplayBadge('Tatwa Studio');
-    if (displaySubtitle) displaySubtitle.textContent = 'Speak to the assistant or select an appliance to begin';
+    if (displaySubtitle) displaySubtitle.textContent = 'Select an appliance category or speak with the assistant';
 
     target.innerHTML = `
-      <div class="tatwa-welcome-container">
-        <div class="tatwa-welcome-card glass-panel">
-          <div class="welcome-brand-emblem glass-card">
-            <img src="images/tatwa_logo.svg" alt="Tatwa Electronics" class="welcome-tatwa-logo" />
+      <div class="tatwa-home-container">
+        <!-- Home Header Banner -->
+        <div class="tatwa-home-header">
+          <div class="tatwa-home-kicker">
+            <span class="pulse-dot-cyan"></span>
+            <span>TATWA SMART LIVING ECOSYSTEM</span>
+          </div>
+          <h2 class="tatwa-home-title">Intelligent Living. Effortless Voice Control.</h2>
+          <p class="tatwa-home-sub">
+            Explore Tatwa's next-generation smart home appliances. Select a category below or speak to the <strong>Tatwa AI Assistant</strong> on the left in English or Hindi.
+          </p>
+        </div>
+
+        <!-- The 4 Appliance Category Grid -->
+        <div class="tatwa-category-grid">
+          <!-- Category 1: Auto-Clean BLDC Chimneys -->
+          <div class="tatwa-cat-card" data-cat="chimney" role="button" tabindex="0">
+            <div class="tatwa-cat-badge">1500 m³/hr • 12-Yr Motor Warranty</div>
+            <div class="tatwa-cat-img-box">
+              <img src="images/chimney_curved_glass.jpg" alt="Smart BLDC Chimneys" />
+            </div>
+            <div class="tatwa-cat-body">
+              <div class="tatwa-cat-meta">
+                <span class="cat-icon">🌪️</span>
+                <span class="cat-count">3 Verified Models</span>
+              </div>
+              <h3 class="tatwa-cat-name">Auto-Clean BLDC Chimneys</h3>
+              <p class="tatwa-cat-desc">Curved glass hoods with 150W inverter motor, thermal auto-clean & touchless wave gesture control.</p>
+              <div class="tatwa-cat-footer">
+                <div class="tatwa-cat-price">
+                  <span class="cat-from">From</span>
+                  <span class="cat-amt">₹21,330</span>
+                  <span class="cat-discount">34% OFF</span>
+                </div>
+                <button class="tatwa-cat-btn" data-cat="chimney">View 3 Models →</button>
+              </div>
+            </div>
           </div>
 
-          <div class="welcome-title-wrap">
-            <span class="welcome-kicker">SMART LIVING • INTELLIGENT APPLIANCES</span>
-            <h2 class="welcome-headline">Tatwa Electronics Smart Appliance Visualizer</h2>
-            <p class="welcome-lead">
-              Official interactive showcase for Tatwa chimneys, dishwashers, washing machines &amp; smart TVs. Speak with the AI assistant on the left to explore appliances, guides &amp; comparisons.
-            </p>
+          <!-- Category 2: PureWash Dishwashers -->
+          <div class="tatwa-cat-card" data-cat="dishwasher" role="button" tabindex="0">
+            <div class="tatwa-cat-badge">14S / 12S / 8S • 70°C Intensive Wash</div>
+            <div class="tatwa-cat-img-box">
+              <img src="images/dw_usp_hero.jpg" alt="PureWash Dishwashers" />
+            </div>
+            <div class="tatwa-cat-body">
+              <div class="tatwa-cat-meta">
+                <span class="cat-icon">🍽️</span>
+                <span class="cat-count">10 Verified Models</span>
+              </div>
+              <h3 class="tatwa-cat-name">PureWash Dishwashers</h3>
+              <p class="tatwa-cat-desc">Engineered for oily kadhais & Indian cookware with intensive 70°C sanitization & water softener.</p>
+              <div class="tatwa-cat-footer">
+                <div class="tatwa-cat-price">
+                  <span class="cat-from">From</span>
+                  <span class="cat-amt">₹17,990</span>
+                  <span class="cat-discount">36% OFF</span>
+                </div>
+                <button class="tatwa-cat-btn" data-cat="dishwasher">View 10 Models →</button>
+              </div>
+            </div>
           </div>
 
-          <div class="welcome-action-hint glass-pill">
-            <div class="hint-pulse"></div>
-            <span>Speak to the <strong>Tatwa AI Assistant</strong> on the left, or select a quick topic below:</span>
+          <!-- Category 3: AI Inverter Washing Machines -->
+          <div class="tatwa-cat-card" data-cat="washing_machine" role="button" tabindex="0">
+            <div class="tatwa-cat-badge">Direct Drive • 1400 RPM • Steam Care</div>
+            <div class="tatwa-cat-img-box">
+              <img src="images/wm_front_load_8kg.jpg" alt="AI Inverter Washers" />
+            </div>
+            <div class="tatwa-cat-body">
+              <div class="tatwa-cat-meta">
+                <span class="cat-icon">🌀</span>
+                <span class="cat-count">4 Verified Models</span>
+              </div>
+              <h3 class="tatwa-cat-name">AI Inverter Washers</h3>
+              <p class="tatwa-cat-desc">Direct drive inverter motor, AI fabric sensors, 99.9% allergy steam wash & 5-Star BEE rating.</p>
+              <div class="tatwa-cat-footer">
+                <div class="tatwa-cat-price">
+                  <span class="cat-from">From</span>
+                  <span class="cat-amt">₹9,990</span>
+                  <span class="cat-discount">31% OFF</span>
+                </div>
+                <button class="tatwa-cat-btn" data-cat="washing_machine">View 4 Models →</button>
+              </div>
+            </div>
           </div>
 
-          <div class="welcome-quick-pills">
-            <button class="welcome-pill glass-button" data-welcome-query="30,000 के अंदर डिशवॉशर और चिमनी">🔍 Models under ₹30k</button>
-            <button class="welcome-pill glass-button" data-welcome-action="installation">🛠️ Chimney Installation</button>
-            <button class="welcome-pill glass-button" data-welcome-action="chimney_cleaning">🧼 Chimney Cleaning</button>
-            <button class="welcome-pill glass-button" data-welcome-action="dishwasher_cleaning">💧 Dishwasher Salt &amp; Care</button>
-            <button class="welcome-pill glass-button" data-welcome-action="dishwasher_loading">🍽️ How to Load Dishwasher</button>
-            <button class="welcome-pill glass-button" data-welcome-action="dishwasher_usp">⭐ Dishwasher USPs</button>
-            <button class="welcome-pill glass-button" data-welcome-action="bldc_motor">⚡ Inverter BLDC Video</button>
-            <button class="welcome-pill glass-button" data-welcome-action="show_all">👁️ Browse All 20 Models</button>
+          <!-- Category 4: Cinema Vision 4K Smart TVs -->
+          <div class="tatwa-cat-card" data-cat="tv" role="button" tabindex="0">
+            <div class="tatwa-cat-badge">4K QLED & OLED • 144Hz VRR</div>
+            <div class="tatwa-cat-img-box">
+              <img src="images/tv_qled_55inch.jpg" alt="Cinema Vision 4K TVs" />
+            </div>
+            <div class="tatwa-cat-body">
+              <div class="tatwa-cat-meta">
+                <span class="cat-icon">📺</span>
+                <span class="cat-count">3 Verified Models</span>
+              </div>
+              <h3 class="tatwa-cat-name">Cinema Vision 4K TVs</h3>
+              <p class="tatwa-cat-desc">Quantum Dot QLED & Cinema OLED displays, 144Hz gaming VRR, Dolby Atmos audio & Google TV.</p>
+              <div class="tatwa-cat-footer">
+                <div class="tatwa-cat-price">
+                  <span class="cat-from">From</span>
+                  <span class="cat-amt">₹21,990</span>
+                  <span class="cat-discount">33% OFF</span>
+                </div>
+                <button class="tatwa-cat-btn" data-cat="tv">View 3 Models →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Voice Actions & Blueprint Triggers -->
+        <div class="tatwa-home-quick-strip">
+          <div class="quick-strip-label">
+            <span>💡 Quick Voice Actions &amp; Technical Blueprints:</span>
+          </div>
+          <div class="quick-pills-row">
+            <button class="home-action-pill" data-welcome-query="30,000 के अंदर डिशवॉशर और चिमनी">🔍 Models under ₹30k</button>
+            <button class="home-action-pill" data-welcome-action="installation">🛠️ Chimney Installation</button>
+            <button class="home-action-pill" data-welcome-action="chimney_cleaning">🧼 Chimney Auto-Clean</button>
+            <button class="home-action-pill" data-welcome-action="dishwasher_cleaning">💧 Dishwasher Salt &amp; Care</button>
+            <button class="home-action-pill" data-welcome-action="dishwasher_loading">🍽️ How to Load Dishwasher</button>
+            <button class="home-action-pill" data-welcome-action="washing_guide">🌀 Fabric Care Guide</button>
+            <button class="home-action-pill" data-welcome-action="tv_calibration">📺 TV Calibration</button>
+            <button class="home-action-pill" data-welcome-action="bldc_motor">⚡ Inverter BLDC Video</button>
+            <button class="home-action-pill" data-welcome-action="show_all">👁️ Browse All 20 Models</button>
           </div>
         </div>
       </div>
     `;
 
-    // Wire suggestion pills inside the welcome card
-    target.querySelectorAll('.welcome-pill').forEach((btn) => {
+    // Wire Category Cards Click Events
+    target.querySelectorAll('.tatwa-cat-card, .tatwa-cat-btn').forEach((elem) => {
+      elem.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cat = elem.getAttribute('data-cat');
+        if (cat) {
+          hitTool({ category: cat });
+          showToast(`Opening ${cat.replace('_', ' ').toUpperCase()} Showcase`);
+        }
+      });
+    });
+
+    // Wire Quick Suggestion Pills
+    target.querySelectorAll('.home-action-pill').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const query = btn.getAttribute('data-welcome-query');
@@ -903,8 +1436,18 @@
           hitTool({ query });
           showToast(`Sending: "${query}"`);
         } else if (action) {
-          hitTool({ action: action === 'show_all' ? 'show_products' : action });
-          showToast(`Showing: ${action}`);
+          if (action === 'washing_guide') {
+            renderWashingMachineGuide(target);
+            updateDisplayBadge('Fabric Care Guide');
+            showToast('Displaying Washing Machine Fabric Care Guide');
+          } else if (action === 'tv_calibration') {
+            renderTVDisplayGuide(target);
+            updateDisplayBadge('TV Calibration Guide');
+            showToast('Displaying TV Display Calibration Guide');
+          } else {
+            hitTool({ action: action === 'show_all' ? 'show_products' : action });
+            showToast(`Showing: ${action}`);
+          }
         }
       });
     });
@@ -997,20 +1540,46 @@
 
     if (products.length === 1) {
       container.innerHTML = `
-        <div class="product-grid single-item">
-          ${renderCard(products[0], 0)}
+        <div class="product-stepper-wrapper">
+          <div class="stepper-header-bar">
+            <div class="stepper-header-left">
+              <button class="btn-back-home-pill" id="btn-back-home" title="Return to All Categories Home">
+                <span>← All Categories</span>
+              </button>
+              <span class="stepper-live-dot"></span>
+              <span class="stepper-title-txt">FEATURED APPLIANCE</span>
+            </div>
+          </div>
+          <div class="product-grid single-item">
+            ${renderCard(products[0], 0)}
+          </div>
         </div>
       `;
+      const btnBack = container.querySelector('#btn-back-home');
+      if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
       return;
     }
 
     if (products.length === 2) {
       container.innerHTML = `
-        <div class="product-grid dual-item">
-          ${renderCard(products[0], 0)}
-          ${renderCard(products[1], 1)}
+        <div class="product-stepper-wrapper">
+          <div class="stepper-header-bar">
+            <div class="stepper-header-left">
+              <button class="btn-back-home-pill" id="btn-back-home" title="Return to All Categories Home">
+                <span>← All Categories</span>
+              </button>
+              <span class="stepper-live-dot"></span>
+              <span class="stepper-title-txt">COMPARING 2 MODELS</span>
+            </div>
+          </div>
+          <div class="product-grid dual-item">
+            ${renderCard(products[0], 0)}
+            ${renderCard(products[1], 1)}
+          </div>
         </div>
       `;
+      const btnBack = container.querySelector('#btn-back-home');
+      if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
       return;
     }
 
@@ -1027,6 +1596,9 @@
       <div class="product-stepper-wrapper" id="product-stepper-wrapper">
         <div class="stepper-header-bar">
           <div class="stepper-header-left">
+            <button class="btn-back-home-pill" id="btn-back-home" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
             <span class="stepper-live-dot"></span>
             <span class="stepper-title-txt">SHOWCASE • 2 AT A TIME</span>
             <span class="badge-stepper-page" id="stepper-counter-badge">1–2 of ${products.length}</span>
@@ -1057,6 +1629,9 @@
         </div>
       </div>
     `;
+
+    const btnBackStepper = container.querySelector('#btn-back-home');
+    if (btnBackStepper) btnBackStepper.addEventListener('click', () => renderTatwaWelcomeScreen(container));
 
     // Connect slider controls & bottom-to-top auto-advancing logic
     const track = container.querySelector('#product-stepper-track');
@@ -3714,25 +4289,43 @@
   initVisualizerSettingTool();
   initOrationWidget();
   connectSSE();
-  // Category Filter Tabs Listener
-  const catTabs = document.querySelectorAll('#category-filter-tabs .cat-tab-btn');
-  catTabs.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      catTabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const cat = btn.getAttribute('data-category');
-      if (cat === 'all') {
-        hitTool({ action: 'show_all' });
-        showToast('Viewing All 20 Tatwa Appliances');
-      } else {
-        hitTool({ category: cat });
-        showToast('Filtering: ' + cat.replace('_', ' ').toUpperCase());
-      }
+  // Wire Return to Home on Brand Logo or Showcase Badge Click
+  const brandHomeBtn = document.getElementById('brand-home-btn');
+  if (brandHomeBtn) {
+    brandHomeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderTatwaWelcomeScreen();
+      showToast('Returned to Categories Home Screen');
     });
-  });
+  }
 
+  const studioBadge = document.getElementById('display-mode-badge');
+  if (studioBadge) {
+    studioBadge.style.cursor = 'pointer';
+    studioBadge.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderTatwaWelcomeScreen();
+      showToast('Returned to Categories Home Screen');
+    });
+  }
 
-  renderTatwaWelcomeScreen();
+  // Handle URL Query Parameters (from direct links or voice session)
+  const urlParams = new URLSearchParams(window.location.search);
+  const qCat = urlParams.get('category');
+  const qAction = urlParams.get('action');
+  const qMode = urlParams.get('mode');
+  const qMaxPrice = urlParams.get('maxPrice');
+
+  if (qCat) {
+    hitTool({ category: qCat, maxPrice: qMaxPrice ? Number(qMaxPrice) : undefined });
+  } else if (qAction) {
+    hitTool({ action: qAction });
+  } else {
+    // Default starting point: Render the Category Home Screen directly on the right canvas
+    renderTatwaWelcomeScreen();
+  }
+
+  if (qMode === 'voice' || qMode === 'controls') {
+    setTimeout(openDrawer, 900);
+  }
 })();

@@ -1,92 +1,167 @@
-# Tatwa Electronics Smart Appliance Visualizer - Backend & Real-Time Sync Service
+# Tatwa Electronics Smart Living Ecosystem & Real-Time Voice Visualizer
 
-Standalone **Real-Time Visualizer & Tool Backend Service** for **Tatwa Electronics** Voice & Chat Smart Home Assistant.
-
-It serves as the webhook tool endpoint that receives Oration AI tool triggers, normalizes appliance selections to the 20 verified Tatwa demo products across 4 categories, and streams them in real-time via Server-Sent Events (SSE) or WebSockets to the synchronized side HTML visualizer widget.
+Official real-time smart home visualizer and webhook tool platform for **Tatwa Electronics** Voice & Chat AI Assistant (powered by Oration AI / OmniAgent).
 
 ---
 
-## 📁 Repository Structure
+## 🏗️ Architecture & Decoupled File Structure
+
+The project is structured with strict separation of concerns into:
+1. **`backend/`**: Standalone Backend Tool API Microservice — deployable independently to Cloudflare Workers or Node.js hosting to serve as the voice webhook tool endpoint for Oration AI.
+2. **`public/index.html`**: The Home Window / Landing Portal (`/`) — an authentic, responsive portal featuring live ecosystem stats, category exploration, voice architecture flow, 1-click endpoint copy, and direct visualizer launchers.
+3. **`public/visualizer/`**: The AI Visualizer Studio (`/visualizer/`) — high-performance real-time visual canvas with deep blue scaled header (52px), splash loading animation, SSE/WebSocket live syncing, URL query routing, product comparisons, and technical interactive guides.
 
 ```
-tatwa-electronics/
-├── src/
-│   ├── index.js                # Cloudflare Worker API & Real-time router
-│   ├── catalog.js              # 20 Tatwa appliances, specs, & fuzzy alias resolver
-│   └── sessionRoom.js          # Cloudflare Durable Object (WebSocket Hibernation & SSE streaming)
+tatwa-electric/
+├── backend/                             # ⚡ STANDALONE BACKEND TOOL MICROSERVICE
+│   ├── src/
+│   │   ├── catalog.js                   # 20 Tatwa appliances, specifications & fuzzy alias resolver
+│   │   ├── index.js                     # Cloudflare Worker API & webhook tool router
+│   │   └── sessionRoom.js               # Durable Object (WebSocket hibernation & SSE live streaming)
+│   ├── server.js                        # Standalone Node.js Express & WebSocket server
+│   ├── wrangler.jsonc                   # Cloudflare Worker & Durable Objects config
+│   ├── package.json                     # Isolated backend dependencies & scripts
+│   ├── test-suite.js                    # 18 automated webhook test cases (100% pass)
+│   └── ORATION_TOOL_SETUP.md            # Complete Oration AI Webhook integration guide & schemas
+│
 ├── public/
-│   ├── index.html              # Redirects cleanly to /visualizer/
-│   └── visualizer/
-│       ├── index.html          # Dual-pane luxury visualizer with category tabs & controls drawer
-│       ├── app.js              # Real-time WebSocket/SSE client, dynamic renderers & simulator
-│       ├── styles.css          # Cyber-electric dark luxury styling, glassmorphism & responsive layout
-│       └── images/             # High-resolution local studio photography, diagrams & SVGs
-├── server.js                   # Node.js Express & WebSocket server for local development
-├── test-suite.js               # 15 automated input test cases (100% passing)
-├── package.json                # Dependencies, type module, & deployment scripts
-├── wrangler.jsonc              # Cloudflare Worker & Durable Objects configuration
-└── .dev.vars.example           # Example local environment secrets
+│   ├── index.html                       # 🏠 HOME WINDOW / LANDING PORTAL (served at /)
+│   └── visualizer/                      # 🎨 AI VISUALIZER STUDIO (served at /visualizer/)
+│       ├── index.html                   # Dual-pane UI, deep blue header, splash loader & controls
+│       ├── app.js                       # Real-time SSE/WS sync client, URL params & interactive state
+│       ├── styles.css                   # Deep blue header (52px), white showcase cards, light theme
+│       └── images/                      # High-res photography, technical blueprints & icons
+│
+├── server.js                            # Monolithic dev server (serves Home Window + Visualizer + API)
+├── test-suite.js                        # Root automated test suite (18 test cases)
+├── package.json                         # Root project dependencies & NPM scripts
+├── wrangler.jsonc                       # Root Cloudflare deployment config
+└── README.md                            # Project overview & documentation
 ```
 
 ---
 
-## 🧪 Local Testing & Verification
+## 🚀 Quick Start (Local Development)
 
-### 1. Run Node.js Server Locally
+### 1. Run the Full Application (Home Window + Visualizer + Backend API)
 ```bash
 npm install
 npm run dev
-# Or: node server.js
+# or: node server.js
 ```
-The server starts locally at `http://localhost:3000`.
-- Visualizer Interface: `http://localhost:3000/visualizer/`
-- SSE Stream: `http://localhost:3000/api/stream/default`
-- WebSocket: `ws://localhost:3000/api/ws?sessionId=default`
-- Tool Endpoint: `http://localhost:3000/api/tool`
-- Catalog (20 Models): `http://localhost:3000/api/products`
+The server will start at `http://localhost:3000`:
+- **Home Window (Portal)**: [`http://localhost:3000/`](http://localhost:3000/)
+- **AI Visualizer Studio**: [`http://localhost:3000/visualizer/`](http://localhost:3000/visualizer/)
+- **Category Deep Links**:
+  - Chimneys: [`http://localhost:3000/visualizer/?category=chimney`](http://localhost:3000/visualizer/?category=chimney)
+  - Dishwashers: [`http://localhost:3000/visualizer/?category=dishwasher`](http://localhost:3000/visualizer/?category=dishwasher)
+  - Washers: [`http://localhost:3000/visualizer/?category=washer`](http://localhost:3000/visualizer/?category=washer)
+  - Smart TVs: [`http://localhost:3000/visualizer/?category=tv`](http://localhost:3000/visualizer/?category=tv)
+- **Webhook Tool Endpoint**: `http://localhost:3000/api/tool`
+- **Catalog API (20 Models)**: `http://localhost:3000/api/products`
+- **SSE Stream**: `http://localhost:3000/api/stream/:sessionId`
 
-### 2. Run Comprehensive Automated Test Suite
+### 2. Run the Standalone Backend Tool API Separately
+If you want to run or deploy the webhook backend independently:
+```bash
+cd backend
+npm install
+npm run dev
+# or: node server.js
+```
+Backend starts on port `8787` (or `PORT` env var).
+
+### 3. Run Automated Test Suite (18/18 Passing)
 ```bash
 npm test
-# Or: node test-suite.js
+# or in backend directory:
+cd backend && npm test
 ```
-Validates all 15 test cases (single strings, arrays, comma-delimited strings, stringified JSON arrays, natural language Hindi & English queries, price filters, comparisons, and guides).
 
 ---
 
-## 🚢 Cloudflare Workers Deployment Guide
+## 🎙️ Oration AI Webhook Tool Configuration
 
-### Step 1: Deploy Directly with Wrangler
+Configure your Oration AI voice assistant with the custom tool definition below:
+
+### Tool Definition
+- **Tool Name**: `display_tatwa_products`
+- **Method**: `POST`
+- **Webhook URL**:
+  - *Local Development (with ngrok)*: `https://<YOUR-NGROK-SUBDOMAIN>.ngrok-free.app/api/tool`
+  - *Production Worker*: `https://tatwa-electronics-visualizer.<SUBDOMAIN>.workers.dev/api/tool`
+- **Description**:
+  > Call this tool whenever the user asks to see, view, compare, filter, or troubleshoot Tatwa appliances (Auto-Clean BLDC chimneys, PureWash dishwashers, AI Inverter washing machines, and Ultra HD 4K TVs). Provide appliance model names or numbers, actions, guides, or category filters.
+
+### JSON Schema (Tool Parameters)
+```json
+{
+  "type": "object",
+  "properties": {
+    "product_enums": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Appliance model identifiers or numbers (e.g., ['TE-CH-601-BLDC'], ['TE-DW-141-INT', 'TE-DW-143-FS'], ['chimney 1', 'tv 2'])."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "show_category",
+        "showcase_spec",
+        "installation_guide",
+        "cleaning_guide",
+        "washing_guide",
+        "tv_calibration",
+        "salt_care",
+        "load_guide",
+        "offers",
+        "video",
+        "welcome"
+      ],
+      "description": "Interactive action or technical guide to project onto the visualizer canvas."
+    },
+    "category": {
+      "type": "string",
+      "enum": ["chimney", "dishwasher", "washer", "tv"],
+      "description": "Category to filter and display."
+    },
+    "max_price": {
+      "type": "number",
+      "description": "Optional budget ceiling in INR (e.g., 30000)."
+    },
+    "display_mode": {
+      "type": "string",
+      "enum": ["single", "comparison", "sequence"],
+      "description": "How products should be laid out on the screen."
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Dynamic session identifier linking the caller to their visualizer window (e.g. {{session.id}} or {{user.sessionId}})."
+    }
+  }
+}
+```
+
+Detailed payloads, cURL examples, and field mappings are documented in [`backend/ORATION_TOOL_SETUP.md`](file:///d:/Tatwa%20projects/tatwa%20electric/backend/ORATION_TOOL_SETUP.md).
+
+---
+
+## 🚢 Production Deployment
+
+### Option A: Deploy Standalone Backend API (Cloudflare Workers)
 ```bash
-# 1. Login to your Cloudflare account
+cd backend
 npx wrangler login
-
-# 2. Test locally with Wrangler dev server
-npm run dev:cf
-# Or: npx wrangler dev --port 8787
-
-# 3. Deploy to Cloudflare Workers with Durable Objects
-npm run deploy
-# Or: npx wrangler deploy
+npx wrangler deploy
 ```
+The webhook endpoint will be available at:
+`https://tatwa-backend-tool.<YOUR-SUBDOMAIN>.workers.dev/api/tool`
 
-Your Worker will be live at:
-`https://tatwa-electronics-visualizer.YOUR_SUBDOMAIN.workers.dev`
-
----
-
-## 📡 API Endpoints Reference
-
-| Endpoint | Method | Description |
-| :--- | :---: | :--- |
-| `/api/tool` | `POST` / `GET` | Main tool endpoint called by Oration Agent when an appliance is discussed. |
-| `/api/oration/product-tool`| `POST` | Alternative tool endpoint alias for Oration webhook integration. |
-| `/api/stream/:sessionId` | `GET` | SSE stream subscribed to by the frontend `app.js` to receive real-time updates. |
-| `/api/ws?sessionId=...` | `GET` (Upgrade) | Real-time WebSocket connection to the session Durable Object. |
-| `/api/config` | `GET` | Returns `publicKey`, `agentId`, and brand metadata for `<oration-widget>`. |
-| `/api/products` | `GET` | Returns all 20 authorized demo Tatwa appliances across 4 categories. |
-| `/api/health` | `GET` | Health check endpoint returning status, categories and timestamp. |
-| `/api/last-state` | `GET` | Polling fallback returning the most recent payload for a given session. |
+### Option B: Deploy Full Monolithic Worker (Backend + Static Assets)
+```bash
+npx wrangler login
+npx wrangler deploy
+```
 
 ---
 
