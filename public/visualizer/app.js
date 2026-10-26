@@ -9,18 +9,26 @@
 
   // 1. Backend URL Management
   function getInitialBackendUrl() {
+    // If running in browser on localhost or local IP, ALWAYS default to current origin (:3000)
+    if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      const saved = localStorage.getItem('tatwa_backend_url');
+      if (saved && (saved.includes('localhost') || saved.includes('127.0.0.1'))) {
+        return saved.trim();
+      }
+      // Clear out any stale cloudflare worker URL cached in browser
+      if (saved && saved.includes('workers.dev')) {
+        try { localStorage.removeItem('tatwa_backend_url'); } catch (e) {}
+      }
+      return window.location.origin;
+    }
+
     const saved = localStorage.getItem('tatwa_backend_url');
     if (saved) return saved.trim();
 
     if (window.TATWA_BACKEND_URL) return window.TATWA_BACKEND_URL.trim();
 
-    // If running in browser on localhost or local IP, default to current host:port
-    if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-      return window.location.origin;
-    }
-
     // Default to the Cloudflare Worker backend
-    return 'https://tatwa-electronics-visualizer.sameer-kar.workers.dev';
+    return 'https://case-3-video-agent.talktous-056.workers.dev';
   }
 
   let backendUrl = getInitialBackendUrl();
@@ -172,7 +180,7 @@
 
   if (btnSwitchCf) {
     btnSwitchCf.addEventListener('click', () => {
-      backendUrl = btnSwitchCf.getAttribute('data-url') || 'https://tatwa-electronics-visualizer.sameer-kar.workers.dev';
+      backendUrl = btnSwitchCf.getAttribute('data-url') || 'https://case-3-video-agent.talktous-056.workers.dev';
       localStorage.setItem('tatwa_backend_url', backendUrl);
       updateBackendUrlDisplay();
       showToast('Switched to Cloudflare Worker backend!');
@@ -232,7 +240,7 @@
     btnEditBackend.addEventListener('click', () => {
       const current = backendUrl || window.location.origin;
       const input = prompt(
-        'Enter Backend Tool API URL:\n(e.g., http://localhost:3000 or https://tatwa-electronics-visualizer.sameer-kar.workers.dev)',
+        'Enter Backend Tool API URL:\n(e.g., http://localhost:3000 or https://case-3-video-agent.talktous-056.workers.dev)',
         current
       );
       if (input !== null) {
