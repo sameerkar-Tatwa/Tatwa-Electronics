@@ -9,26 +9,26 @@
 
   // 1. Backend URL Management
   function getInitialBackendUrl() {
-    // If running in browser on localhost or local IP, ALWAYS default to current origin (:3000)
-    if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    // Purge stale/broken external worker URL from localStorage
+    try {
       const saved = localStorage.getItem('tatwa_backend_url');
-      if (saved && (saved.includes('localhost') || saved.includes('127.0.0.1'))) {
-        return saved.trim();
+      if (saved && (saved.includes('workers.dev') || saved.includes('undefined') || saved.includes('null'))) {
+        localStorage.removeItem('tatwa_backend_url');
       }
-      // Clear out any stale cloudflare worker URL cached in browser
-      if (saved && saved.includes('workers.dev')) {
-        try { localStorage.removeItem('tatwa_backend_url'); } catch (e) {}
-      }
-      return window.location.origin;
-    }
+    } catch (e) {}
 
     const saved = localStorage.getItem('tatwa_backend_url');
-    if (saved) return saved.trim();
+    if (saved && saved.trim()) return saved.trim();
 
-    if (window.TATWA_BACKEND_URL) return window.TATWA_BACKEND_URL.trim();
+    if (window.TATWA_BACKEND_URL && window.TATWA_BACKEND_URL.trim()) {
+      return window.TATWA_BACKEND_URL.trim();
+    }
 
-    // Default to the Cloudflare Worker backend
-    return 'https://case-3-video-agent.talktous-056.workers.dev';
+    // Default to the current deployed window origin
+    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') {
+      return window.location.origin;
+    }
+    return '';
   }
 
   let backendUrl = getInitialBackendUrl();
@@ -287,53 +287,188 @@
 
   // 3. Fetch Oration Keys from Backend and Mount <oration-widget>
   async function initOrationWidget() {
+    let pk = '70588826-0a19-4c4f-abdf-6de6c720d793';
+    let ag = '128f59b2-7f37-4e1f-badd-f18c7a2a2287';
+
     try {
-      const targetUrl = `${backendUrl}/api/config`;
+      const targetUrl = backendUrl ? `${backendUrl}/api/config` : '/api/config';
       const res = await fetch(targetUrl);
-      if (!res.ok) return;
-
-      const config = await res.json();
-      let pk = config.publicKey || '';
-      let ag = config.agentId || '';
-      if (!pk || pk.startsWith('pk_your_')) pk = '70588826-0a19-4c4f-abdf-6de6c720d793';
-      if (!ag || ag.startsWith('ag_your_')) ag = '128f59b2-7f37-4e1f-badd-f18c7a2a2287';
-
-      if (widgetMountPoint) {
-        widgetMountPoint.innerHTML = '';
-
-        if (!ag || ag.startsWith('ag_your_')) {
-          widgetMountPoint.innerHTML = `
-            <div style="text-align: center; padding: 2.5rem 1.5rem; color: #475569; max-width: 380px; margin: auto;">
-              <div style="width: 54px; height: 54px; background: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.6rem;">🎙️</div>
-              <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.4rem;">Oration Agent Ready</h3>
-              <p style="font-size: 0.8rem; line-height: 1.5; color: #64748b; margin-bottom: 1.25rem;">
-                Set your <code>ORATION_PUBLIC_KEY</code> and <code>ORATION_AGENT_ID</code> in backend environment.
-              </p>
-              <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; font-size: 0.75rem; font-family: monospace; text-align: left; color: #334155;">
-                ORATION_PUBLIC_KEY="..."<br/>
-                ORATION_AGENT_ID="..."
-              </div>
-            </div>
-          `;
-          if (agentStatusLabel) agentStatusLabel.textContent = 'Awaiting Keys';
-        } else {
-          // Mount official <oration-widget> directly filling the left pane
-          widgetMountPoint.innerHTML = `
-            <oration-widget
-              public-key="${pk}"
-              default-agent-id="${ag}"
-              conversation-type="both"
-              dynamic-variables='${JSON.stringify({ sessionId })}'>
-            </oration-widget>
-          `;
-          if (agentStatusLabel) agentStatusLabel.textContent = `Active (${ag.slice(0, 8)}...)`;
-
-          const widget = widgetMountPoint.querySelector('oration-widget');
-          embedWidgetInLeftPane(widget);
-        }
+      if (res.ok) {
+        const config = await res.json();
+        if (config.publicKey && !config.publicKey.startsWith('pk_your_')) pk = config.publicKey;
+        if (config.agentId && !config.agentId.startsWith('ag_your_')) ag = config.agentId;
       }
     } catch (e) {
-      console.warn('Could not fetch /api/config from backend', e);
+      console.warn('Could not fetch /api/config from backend; using default Tatwa agent keys', e);
+    }
+
+    if (widgetMountPoint) {
+      widgetMountPoint.innerHTML = `
+        <div class="tatwa-voice-card" id="tatwa-voice-hero">
+          <div class="voice-hero-orb-wrap">
+            <div class="voice-hero-ripple r1"></div>
+            <div class="voice-hero-ripple r2"></div>
+            <button class="voice-hero-orb-btn" id="btn-hero-start-voice" title="Tap to Start Voice Assistant">
+              <span class="orb-mic-icon">🎙️</span>
+            </button>
+          </div>
+          <h3 class="voice-hero-title">Tatwa AI Voice Assistant</h3>
+          <p class="voice-hero-subtitle">Tap below to talk naturally in English, Hindi, Tamil, Kannada, or Telugu.</p>
+
+          <div class="voice-hero-actions">
+            <button class="btn-hero-voice-mode" id="btn-hero-voice-action">
+              <span class="btn-act-icon">🎙️</span>
+              <span>Tap to Speak (Voice Mode)</span>
+            </button>
+            <button class="btn-hero-chat-mode" id="btn-hero-chat-action">
+              <span class="btn-act-icon">💬</span>
+              <span>Open Text Chat</span>
+            </button>
+          </div>
+
+          <div class="voice-hero-prompts-box">
+            <div class="prompts-box-header">💡 Try Asking:</div>
+            <div class="hero-prompt-item" data-prompt="30,000 के अंदर डिशवॉशर और चिमनी">"30,000 के अंदर डिशवॉशर और चिमनी"</div>
+            <div class="hero-prompt-item" data-prompt="Compare 55 inch QLED vs 65 inch OLED TV">"Compare 55\" QLED vs 65\" OLED TV"</div>
+            <div class="hero-prompt-item" data-prompt="Chimney heat auto-clean step-by-step procedure">"Chimney heat auto-clean procedure"</div>
+            <div class="hero-prompt-item" data-prompt="Dishwasher salt refill and maintenance">"Dishwasher salt refill and maintenance"</div>
+          </div>
+        </div>
+
+        <div class="oration-widget-dock" id="oration-widget-dock">
+          <oration-widget
+            public-key="${pk}"
+            default-agent-id="${ag}"
+            conversation-type="both"
+            dynamic-variables='${JSON.stringify({ sessionId })}'>
+          </oration-widget>
+        </div>
+      `;
+
+      if (agentStatusLabel) agentStatusLabel.textContent = `Active (${ag.slice(0, 8)}...)`;
+
+      const btnResetVoice = document.getElementById('btn-reset-voice-pane');
+      if (btnResetVoice) {
+        btnResetVoice.onclick = () => {
+          const heroCard = document.getElementById('tatwa-voice-hero');
+          const dock = document.getElementById('oration-widget-dock');
+          if (heroCard) heroCard.style.display = 'flex';
+          if (dock) {
+            dock.classList.remove('dock-active');
+            dock.style.display = 'none';
+          }
+          btnResetVoice.style.display = 'none';
+          if (agentStatusLabel) agentStatusLabel.textContent = `Active (${ag.slice(0, 8)}...)`;
+          showToast('Returned to Voice Assistant Launcher');
+        };
+      }
+
+      function triggerOration(mode = 'voice') {
+        const heroCard = document.getElementById('tatwa-voice-hero');
+        const dock = document.getElementById('oration-widget-dock');
+        const widget = widgetMountPoint.querySelector('oration-widget');
+
+        if (heroCard) heroCard.style.display = 'none';
+        if (dock) {
+          dock.classList.add('dock-active');
+          dock.style.display = 'flex';
+        }
+        if (btnResetVoice) btnResetVoice.style.display = 'inline-flex';
+        if (agentStatusLabel) agentStatusLabel.textContent = `Connecting (${mode.toUpperCase()})...`;
+
+        function tryClick() {
+          if (!widget || !widget.shadowRoot) return false;
+          const buttons = Array.from(widget.shadowRoot.querySelectorAll('button'));
+          const vBtn = buttons.find(b => b.textContent && b.textContent.includes('Voice'));
+          const cBtn = buttons.find(b => b.textContent && b.textContent.includes('Chat'));
+
+          if (mode === 'voice' && vBtn) {
+            vBtn.click();
+            if (agentStatusLabel) agentStatusLabel.textContent = 'Voice Active';
+            return true;
+          }
+          if (mode === 'chat' && cBtn) {
+            cBtn.click();
+            if (agentStatusLabel) agentStatusLabel.textContent = 'Chat Active';
+            return true;
+          }
+
+          const startTarget = widget.shadowRoot.querySelector('.cursor-pointer') ||
+                              widget.shadowRoot.querySelector('span');
+          if (startTarget) {
+            startTarget.click();
+            setTimeout(() => {
+              const updatedBtns = Array.from(widget.shadowRoot.querySelectorAll('button'));
+              const v = updatedBtns.find(b => b.textContent && b.textContent.includes('Voice'));
+              const c = updatedBtns.find(b => b.textContent && b.textContent.includes('Chat'));
+              if (mode === 'voice' && v) {
+                v.click();
+                if (agentStatusLabel) agentStatusLabel.textContent = 'Voice Active';
+              } else if (mode === 'chat' && c) {
+                c.click();
+                if (agentStatusLabel) agentStatusLabel.textContent = 'Chat Active';
+              }
+            }, 350);
+            return true;
+          }
+          return false;
+        }
+
+        if (!tryClick()) {
+          let tries = 0;
+          const poll = setInterval(() => {
+            tries++;
+            if (tryClick() || tries > 25) clearInterval(poll);
+          }, 200);
+        }
+      }
+
+      // Wire Hero Launcher Buttons
+      const btnHeroOrb = document.getElementById('btn-hero-start-voice');
+      const btnHeroVoice = document.getElementById('btn-hero-voice-action');
+      const btnHeroChat = document.getElementById('btn-hero-chat-action');
+
+      if (btnHeroOrb) btnHeroOrb.onclick = () => triggerOration('voice');
+      if (btnHeroVoice) btnHeroVoice.onclick = () => triggerOration('voice');
+      if (btnHeroChat) btnHeroChat.onclick = () => triggerOration('chat');
+
+      // Wire sample prompts
+      widgetMountPoint.querySelectorAll('.hero-prompt-item').forEach(item => {
+        item.onclick = () => {
+          const promptText = item.getAttribute('data-prompt');
+          if (promptText) {
+            hitTool({ query: promptText });
+            showToast(`Simulated: "${promptText}"`);
+          }
+        };
+      });
+
+      const widget = widgetMountPoint.querySelector('oration-widget');
+      if (widget) {
+        embedWidgetInLeftPane(widget);
+
+        // Auto-monitor widget state if user clicks directly on widget
+        const checkWidgetObserver = setInterval(() => {
+          if (widget.shadowRoot) {
+            clearInterval(checkWidgetObserver);
+            const obs = new MutationObserver(() => {
+              const html = widget.shadowRoot.innerHTML;
+              if (html.includes('Choose conversation') || html.includes('Connecting') || html.includes('End Call') || html.includes('Type a message')) {
+                const hero = document.getElementById('tatwa-voice-hero');
+                const dock = document.getElementById('oration-widget-dock');
+                if (hero && hero.style.display !== 'none') hero.style.display = 'none';
+                if (dock && !dock.classList.contains('dock-active')) {
+                  dock.classList.add('dock-active');
+                  dock.style.display = 'flex';
+                }
+                if (btnResetVoice) btnResetVoice.style.display = 'inline-flex';
+              }
+            });
+            obs.observe(widget.shadowRoot, { childList: true, subtree: true, characterData: true });
+          }
+        }, 150);
+        setTimeout(() => clearInterval(checkWidgetObserver), 10000);
+      }
     }
   }
 
@@ -351,7 +486,7 @@
           styleTag = document.createElement('style');
           styleTag.id = 'embedded-left-pane-override';
           styleTag.textContent = `
-            /* Fill 100% of the left vertical screen */
+            /* Fill 100% of the dock */
             div[class*="fixed"] {
               position: relative !important;
               bottom: auto !important;
@@ -418,7 +553,7 @@
               border-bottom: 1px solid #f1f5f9 !important;
             }
 
-            /* Middle Scrollable Transcript remains fixed in center */
+            /* Middle Scrollable Transcript */
             div.flex-1.w-full {
               flex: 1 1 auto !important;
               min-height: 0 !important;
@@ -436,7 +571,7 @@
               padding: 0.5rem 0.25rem !important;
             }
 
-            /* Fixed Bottom Controls & Action Buttons */
+            /* Fixed Bottom Controls */
             div[class*="space-y-4"] > div:last-child {
               flex-shrink: 0 !important;
               margin-top: auto !important;
@@ -445,26 +580,11 @@
               border-top: 1px solid #e2e8f0 !important;
             }
 
-            /* Centered Start / Call Button when Idle */
-            div:has(> button[type="button"]) {
-              margin: auto !important;
-              display: flex !important;
-              flex-direction: column !important;
-              align-items: center !important;
-              justify-content: center !important;
-              padding: 2rem !important;
-              height: 100% !important;
-            }
-
-            button[type="button"] {
+            /* Buttons inside widget */
+            button[type="button"], button {
               border-radius: 12px !important;
               font-weight: 600 !important;
               transition: all 0.2s ease !important;
-            }
-
-            button[type="button"]:hover {
-              transform: translateY(-1px) !important;
-              box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
             }
           `;
           root.appendChild(styleTag);
@@ -475,15 +595,8 @@
     }
 
     applyLeftPaneStyles();
-    const interval = setInterval(applyLeftPaneStyles, 150);
-    setTimeout(() => clearInterval(interval), 5000);
-
-    try {
-      const observer = new MutationObserver(applyLeftPaneStyles);
-      if (widgetEl.shadowRoot) {
-        observer.observe(widgetEl.shadowRoot, { childList: true, subtree: true });
-      }
-    } catch (_) {}
+    const interval = setInterval(applyLeftPaneStyles, 200);
+    setTimeout(() => clearInterval(interval), 6000);
   }
 
   // 4. Live Multi-Protocol Synchronization Manager (WebSocket + SSE + Smart Polling)

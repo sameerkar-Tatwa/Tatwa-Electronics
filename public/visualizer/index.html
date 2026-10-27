@@ -65,6 +65,7 @@
           <h2>Tatwa AI Assistant</h2>
         </div>
         <span id="agent-status-label" class="agent-badge">Active</span>
+        <button id="btn-reset-voice-pane" class="btn-reset-voice-pill" title="Reset Voice Assistant" style="display: none;"><span>↻ Reset</span></button>
       </div>
 
       <!-- Oration Widget Container (Completely covers the left side vertically) -->
@@ -491,8 +492,7 @@
   <!-- Notification Toast -->
   <div class="toast-msg" id="toast-msg">Notification</div>
 
-  <!-- Load official Oration Widget SDK -->
-  <script src="https://unpkg.com/@oration/widget/dist/index.umd.js"></script>
+  <script src="https://unpkg.com/@oration/widget@0.0.9/dist/index.umd.js"></script>
 
   <!-- Application Logic -->
   <script src="app.js"></script>
