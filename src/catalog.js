@@ -1039,14 +1039,53 @@ export function resolveToolRequest(rawInput = {}) {
   // 2. Extract Category
   let category = merged.category ? String(merged.category).toLowerCase().trim() : '';
   if (!category || category === 'all' || category === 'both') {
-    if (lowerText.includes('washing machine') || lowerText.includes('washer') || lowerText.includes('कपड़े') || lowerText.includes('वाशिंग मशीन')) {
-      category = 'washing_machine';
-    } else if (lowerText.includes('tv') || lowerText.includes('television') || lowerText.includes('qled') || lowerText.includes('oled') || lowerText.includes('टीवी') || lowerText.includes('टेलीविजन')) {
-      category = 'tv';
-    } else if (lowerText.includes('chimney') || lowerText.includes('चिमनी') || lowerText.includes('hood') || lowerText.includes('suction') || lowerText.includes('bldc')) {
-      category = 'chimney';
-    } else if (lowerText.includes('dishwasher') || lowerText.includes('डिशवॉशर') || lowerText.includes('बर्तन')) {
+    // Check dishwasher BEFORE washing machine to avoid "dishwasher" matching "washer"
+    if (
+      lowerText.includes('dishwasher') ||
+      lowerText.includes('dish washer') ||
+      lowerText.includes('डिशवॉशर') ||
+      lowerText.includes('बर्तन') ||
+      lowerText.includes('utensil') ||
+      lowerText.includes('fbid') ||
+      lowerText.includes('fsid') ||
+      lowerText.includes('ffsd') ||
+      lowerText.includes('place setting')
+    ) {
       category = 'dishwasher';
+    } else if (
+      lowerText.includes('washing machine') ||
+      /\b(washer|washers|washing)\b/i.test(lowerText) ||
+      lowerText.includes('front load') ||
+      lowerText.includes('top load') ||
+      lowerText.includes('twin tub') ||
+      lowerText.includes('laundry') ||
+      lowerText.includes('ecowash') ||
+      lowerText.includes('hydropulse') ||
+      lowerText.includes('aerocare') ||
+      lowerText.includes('aquaspin') ||
+      lowerText.includes('कपड़े') ||
+      lowerText.includes('वाशिंग मशीन')
+    ) {
+      category = 'washing_machine';
+    } else if (
+      /\b(tvs?|tv's|television|televisions|smart\s*tvs?|qled|oled|uhd)\b/i.test(lowerText) ||
+      lowerText.includes('टीवी') ||
+      lowerText.includes('टेलीविजन') ||
+      lowerText.includes('crystalview') ||
+      lowerText.includes('vision pro') ||
+      lowerText.includes('nova')
+    ) {
+      category = 'tv';
+    } else if (
+      lowerText.includes('chimney') ||
+      lowerText.includes('चिमनी') ||
+      lowerText.includes('hood') ||
+      lowerText.includes('suction') ||
+      lowerText.includes('bldc') ||
+      lowerText.includes('aero') ||
+      lowerText.includes('auto clean')
+    ) {
+      category = 'chimney';
     }
   }
 
@@ -1080,7 +1119,15 @@ export function resolveToolRequest(rawInput = {}) {
     action = 'sequence';
   } else if (action === 'welcome' || lowerText.includes('welcome') || lowerText.includes('होम') || lowerText.includes('home')) {
     action = 'welcome';
-  } else if (lowerText.includes('compare') || lowerText.includes('कंपेयर') || lowerText.includes('तुलना') || lowerText.includes('vs') || merged.compare === true || merged.compare === 'true') {
+  } else if (
+    /\b(compare|comparison|comparing|versus|vs|diff|difference)\b/i.test(lowerText) ||
+    lowerText.includes('कंपेयर') ||
+    lowerText.includes('तुलना') ||
+    lowerText.includes('अंतर') ||
+    lowerText.includes('फर्क') ||
+    merged.compare === true ||
+    merged.compare === 'true'
+  ) {
     action = 'compare_products';
   } else if (lowerText.includes('offer') || lowerText.includes('ऑफर') || lowerText.includes('discount') || lowerText.includes('छूट') || lowerText.includes('deal')) {
     action = 'show_offers';
@@ -1269,7 +1316,17 @@ export function resolveToolRequest(rawInput = {}) {
   }
 
   // 1i. TV Display & Picture Calibration Guide
-  if (action === 'tv_display_guide' || action === 'tv_guide' || lowerText.includes('qled vs oled')) {
+  if (
+    action === 'tv_display_guide' ||
+    action === 'tv_guide' ||
+    action === 'display_guide' ||
+    lowerText.includes('qled vs oled') ||
+    lowerText.includes('display guide') ||
+    lowerText.includes('screen guide') ||
+    lowerText.includes('picture guide') ||
+    lowerText.includes('audio calibration') ||
+    (lowerText.includes('calibration') && (category === 'tv' || lowerText.includes('tv')))
+  ) {
     return {
       componentType: 'tv-display-guide',
       title: 'Tatwa Cinema Display & Audio Calibration Guide',
@@ -1310,7 +1367,12 @@ export function resolveToolRequest(rawInput = {}) {
   // VIEW 2: OFFERS & PROMOTIONAL DEALS SHOWCASE
   // ==========================================================================
   if (action === 'show_offers' || action === 'offers' || action === 'discounts') {
-    const wantsCompare = lowerText.includes('compare') || lowerText.includes('कंपेयर') || lowerText.includes('तुलना') || lowerText.includes('vs') || merged.compare === true || merged.compare === 'true';
+    const wantsCompare =
+      /\b(compare|comparison|comparing|versus|vs)\b/i.test(lowerText) ||
+      lowerText.includes('कंपेयर') ||
+      lowerText.includes('तुलना') ||
+      merged.compare === true ||
+      merged.compare === 'true';
 
     let offerCandidates = allProducts.filter((p) => p.isOffer);
     if (category && category !== 'all' && category !== 'both') {
@@ -1362,7 +1424,10 @@ export function resolveToolRequest(rawInput = {}) {
     const targetList = matching.length > 0 ? matching : pool;
     const catLabel = category ? (category === 'washing_machine' ? 'Washing Machines' : category === 'tv' ? 'Smart TVs' : category === 'chimney' ? 'Chimneys' : 'Dishwashers') : 'Appliances';
 
-    const wantsCompare = lowerText.includes('compare') || lowerText.includes('कंपेयर') || lowerText.includes('तुलना') || lowerText.includes('vs');
+    const wantsCompare =
+      /\b(compare|comparison|comparing|versus|vs)\b/i.test(lowerText) ||
+      lowerText.includes('कंपेयर') ||
+      lowerText.includes('तुलना');
 
     if (wantsCompare && targetList.length >= 2) {
       return {
@@ -1417,7 +1482,42 @@ export function resolveToolRequest(rawInput = {}) {
         .filter(Boolean);
     }
 
-    // Fallback if no specific products provided: compare category candidates
+    // If no explicit product list was passed, attempt to extract mentioned products from text
+    if (toCompare.length < 2 && lowerText) {
+      // Check for specific TV mentions
+      if (category === 'tv' || lowerText.includes('tv') || lowerText.includes('टीवी')) {
+        const found = [];
+        if (/\b(tv\s*1|55\s*inch|55"|qled|vision\s*pro)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_55_QLED);
+        if (/\b(tv\s*2|65\s*inch|65"|oled|crystalview)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_65_OLED);
+        if (/\b(tv\s*3|43\s*inch|43"|uhd|frameless|nova)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_43_UHD);
+        if (found.length >= 2) {
+          toCompare = found;
+        }
+      }
+      // Check for specific chimney mentions
+      if (category === 'chimney' || lowerText.includes('chimney') || lowerText.includes('चिमनी')) {
+        const found = [];
+        if (/\b(chimney\s*1|60\s*cm|60cm|aero\s*60)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_60);
+        if (/\b(chimney\s*2|75\s*cm|75cm|aero\s*75)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_75);
+        if (/\b(chimney\s*3|90\s*cm|90cm|aero\s*90)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_90);
+        if (found.length >= 2) {
+          toCompare = found;
+        }
+      }
+      // Check for specific washing machine mentions
+      if (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('कपड़े')) {
+        const found = [];
+        if (/\b(wm\s*1|washing\s*machine\s*1|front\s*load|ecowash|8\s*kg|8kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_FL8_INV);
+        if (/\b(wm\s*2|washing\s*machine\s*2|top\s*load|hydropulse|7\.5\s*kg|7\.5kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_TL75_SMT);
+        if (/\b(wm\s*3|washing\s*machine\s*3|washer\s*dryer|aerocare|combo|10\s*kg|10kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_WD10_AI);
+        if (/\b(wm\s*4|washing\s*machine\s*4|semi\s*automatic|twin\s*tub|aquaspin|6\.5\s*kg|6\.5kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_SA65_TT);
+        if (found.length >= 2) {
+          toCompare = found;
+        }
+      }
+    }
+
+    // Fallback if still under 2: compare category candidates
     if (toCompare.length < 2) {
       if (category === 'chimney') {
         toCompare = [TATWA_PRODUCT_CATALOG.AERO_60, TATWA_PRODUCT_CATALOG.AERO_75, TATWA_PRODUCT_CATALOG.AERO_90];
@@ -1441,9 +1541,11 @@ export function resolveToolRequest(rawInput = {}) {
     // Limit to max 4 models for clean side-by-side rendering
     toCompare = toCompare.slice(0, 4);
 
+    const catLabel = category ? (category === 'washing_machine' ? 'Washing Machines' : category === 'tv' ? 'Smart TVs' : category === 'chimney' ? 'Chimneys' : 'Dishwashers') : 'Appliance';
+
     return {
       componentType: 'comparison',
-      title: `Tatwa Appliance Comparison (${toCompare.length} Models)`,
+      title: `Tatwa ${catLabel} Comparison (${toCompare.length} Models)`,
       subtitle: `Side-by-side technical specification, capacity and price matrix`,
       products: toCompare,
       images: toCompare.map((p) => ({
@@ -1528,21 +1630,26 @@ function resolveSingleProduct(query, allProducts) {
   }
   const q = String(query).toLowerCase().trim();
 
-  // 1. Direct enumKey or id match
+  // 1. Category-level filter guard: if input is a generic category word, return null so category showcase runs
+  if (/^(tvs?|tv's|television|televisions|smart\s*tvs?|chimneys?|dishwashers?|washing\s*machines?|appliances?)$/i.test(q)) {
+    return null;
+  }
+
+  // 2. Direct enumKey, id, or sku match
   for (const p of allProducts) {
     if (p.id.toLowerCase() === q || p.enumKey.toLowerCase() === q || p.sku.toLowerCase() === q) {
       return p;
     }
   }
 
-  // 2. Direct name or modelName match
+  // 3. Direct name or modelName match
   for (const p of allProducts) {
     if (p.name.toLowerCase() === q || p.modelName.toLowerCase() === q) {
       return p;
     }
   }
 
-  // 3. Numbered aliases (Chimney 1, 2, 3; Dishwasher 1, 2; Washing Machine 1, 2, 3, 4; TV 1, 2, 3)
+  // 4. Numbered aliases (Chimney 1, 2, 3; Dishwasher 1, 2; Washing Machine 1, 2, 3, 4; TV 1, 2, 3)
   if (q.includes('chimney 1') || q === 'c1' || q.includes('aero 60') || q.includes('60 cm') || q.includes('60cm')) return TATWA_PRODUCT_CATALOG.AERO_60;
   if (q.includes('chimney 2') || q === 'c2' || q.includes('aero 75') || q.includes('75 cm') || q.includes('75cm')) return TATWA_PRODUCT_CATALOG.AERO_75;
   if (q.includes('chimney 3') || q === 'c3' || q.includes('aero 90') || q.includes('90 cm') || q.includes('90cm')) return TATWA_PRODUCT_CATALOG.AERO_90;
@@ -1561,11 +1668,11 @@ function resolveSingleProduct(query, allProducts) {
   if (q.includes('washing machine 3') || q.includes('washer dryer') || q.includes('aerocare') || q.includes('combo') || q.includes('10 kg') || q.includes('10kg')) return TATWA_PRODUCT_CATALOG.WM_WD10_AI;
   if (q.includes('washing machine 4') || q.includes('semi automatic') || q.includes('twin tub') || q.includes('aquaspin') || q.includes('6.5 kg') || q.includes('6.5kg')) return TATWA_PRODUCT_CATALOG.WM_SA65_TT;
 
-  if (q.includes('tv 1') || q.includes('qled') || q.includes('55 inch') || q.includes('55"') || q.includes('vision pro')) return TATWA_PRODUCT_CATALOG.TV_55_QLED;
-  if (q.includes('tv 2') || q.includes('oled') || q.includes('65 inch') || q.includes('65"') || q.includes('crystalview')) return TATWA_PRODUCT_CATALOG.TV_65_OLED;
-  if (q.includes('tv 3') || q.includes('43 inch') || q.includes('43"') || q.includes('frameless') || q.includes('nova')) return TATWA_PRODUCT_CATALOG.TV_43_UHD;
+  if (q.includes('tv 1') || q.includes('551-qled') || (q.includes('qled') && !q.includes('oled')) || q.includes('55 inch') || q.includes('55"') || q.includes('55-inch') || q.includes('vision pro')) return TATWA_PRODUCT_CATALOG.TV_55_QLED;
+  if (q.includes('tv 2') || q.includes('651-oled') || q.includes('oled') || q.includes('65 inch') || q.includes('65"') || q.includes('65-inch') || q.includes('crystalview')) return TATWA_PRODUCT_CATALOG.TV_65_OLED;
+  if (q.includes('tv 3') || q.includes('431-uhd') || (q.includes('43') && (q.includes('tv') || q.includes('uhd') || q.includes('inch'))) || q.includes('frameless') || q.includes('nova')) return TATWA_PRODUCT_CATALOG.TV_43_UHD;
 
-  // 4. Substring fallback
+  // 5. Substring fallback
   for (const p of allProducts) {
     if (p.name.toLowerCase().includes(q) || q.includes(p.name.toLowerCase())) {
       return p;

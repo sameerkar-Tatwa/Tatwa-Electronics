@@ -342,13 +342,110 @@ const tests = [
         res.body.displayedProducts.length === 3 &&
         res.body.displayedProducts.every(p => p.category === 'tv');
     }
+  },
+  {
+    id: 'TC-19',
+    name: 'Voice query "TV\'s" category showcase',
+    description: 'User says "TV\'s" or "Tell me about TVs", resolving to 3 verified Tatwa Smart TVs',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "TV's" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'products' &&
+        res.body.displayedProducts.length === 3 &&
+        res.body.displayedProducts.every(p => p.category === 'tv');
+    }
+  },
+  {
+    id: 'TC-20',
+    name: 'Voice query "comparison between the TV\'s"',
+    description: 'User asks for comparison between TVs using apostrophe query',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "comparison between the TV's" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 3 &&
+        res.body.displayedProducts.every(p => p.category === 'tv');
+    }
+  },
+  {
+    id: 'TC-21',
+    name: 'Voice query "comparison between the washing machines"',
+    description: 'Natural language comparison for washing machines',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "comparison between the washing machines" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length >= 2 &&
+        res.body.displayedProducts.every(p => p.category === 'washing_machine');
+    }
+  },
+  {
+    id: 'TC-22',
+    name: 'Voice query "comparison between the chimneys"',
+    description: 'Natural language comparison for chimneys',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "comparison between the chimneys" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 3 &&
+        res.body.displayedProducts.every(p => p.category === 'chimney');
+    }
+  },
+  {
+    id: 'TC-23',
+    name: 'Voice query "Tell me about dishwashers" (Disambiguation)',
+    description: 'Ensures dishwashers query never false-matches washing machine',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "Tell me about dishwashers" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'products' &&
+        res.body.displayedProducts.length >= 2 &&
+        res.body.displayedProducts.every(p => p.category === 'dishwasher');
+    }
+  },
+  {
+    id: 'TC-24',
+    name: 'Query "Compare TV 1 and TV 2" (Specific Models)',
+    description: 'Extracts exact TV 1 and TV 2 models from text for side-by-side matrix',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "Compare TV 1 and TV 2" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 2 &&
+        res.body.displayedProducts[0].sku === 'TE-TV-551-QLED' &&
+        res.body.displayedProducts[1].sku === 'TE-TV-651-OLED';
+    }
   }
 ];
 
 // Runner
 async function runTestSuite() {
   console.log('===============================================================');
-  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (18 TEST CASES)`);
+  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (24 TEST CASES)`);
   console.log(`Target: ${BASE_URL}`);
   console.log('===============================================================\n');
 
