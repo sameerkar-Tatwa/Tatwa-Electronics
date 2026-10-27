@@ -9,26 +9,27 @@
 
   // 1. Backend URL Management
   function getInitialBackendUrl() {
-    // Purge stale/broken external worker URL from localStorage
-    try {
-      const saved = localStorage.getItem('tatwa_backend_url');
-      if (saved && (saved.includes('workers.dev') || saved.includes('undefined') || saved.includes('null'))) {
-        localStorage.removeItem('tatwa_backend_url');
-      }
-    } catch (e) {}
+    if (typeof window !== 'undefined' && window.location) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const qBackend = urlParams.get('backend');
+      if (qBackend && qBackend.trim()) return qBackend.trim();
+    }
 
     const saved = localStorage.getItem('tatwa_backend_url');
-    if (saved && saved.trim()) return saved.trim();
+    if (saved && saved.trim() && !saved.includes('case-3-video-agent')) return saved.trim();
 
     if (window.TATWA_BACKEND_URL && window.TATWA_BACKEND_URL.trim()) {
       return window.TATWA_BACKEND_URL.trim();
     }
 
-    // Default to the current deployed window origin
-    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') {
-      return window.location.origin;
+    if (typeof window !== 'undefined' && window.location) {
+      if (window.location.hostname.includes('workers.dev') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return window.location.origin;
+      }
     }
-    return '';
+
+    // Default to the live Tatwa Cloudflare Worker backend
+    return 'https://tatwa-electronics.sameer-kar.workers.dev';
   }
 
   let backendUrl = getInitialBackendUrl();
@@ -36,14 +37,14 @@
     backendUrl = backendUrl.slice(0, -1);
   }
 
-  // 2. Session ID Management
+  // 2. Session ID Management: Always default to 'default' matching Oration AI Webhooks
   function getSessionId() {
-    let sess = sessionStorage.getItem('tatwa_visualizer_session');
-    if (!sess) {
-      sess = 'sess_' + Math.random().toString(36).substring(2, 9);
-      sessionStorage.setItem('tatwa_visualizer_session', sess);
+    if (typeof window !== 'undefined' && window.location) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const qSess = urlParams.get('sessionId') || urlParams.get('session');
+      if (qSess && qSess.trim()) return qSess.trim();
     }
-    return sess;
+    return 'default';
   }
 
   const sessionId = getSessionId();
@@ -608,15 +609,7 @@
   // 5. Dynamic Component Viewport Renderer
   function handleIncomingImages(payload) {
     if (!payload) return;
-
-    // Reject stale cached/replayed events from prior sessions so refresh stays on Tatwa screen
-    if (payload.timestamp) {
-      const eventTime = new Date(payload.timestamp).getTime();
-      if (!isNaN(eventTime) && eventTime < pageStartTime - 2000) {
-        console.log('[Visualizer] Ignored stale replayed payload from previous session:', payload.title || payload.componentType);
-        return;
-      }
-    }
+    console.log('[Visualizer] Incoming event received:', payload.title || payload.componentType, payload);
 
     // Deduplicate identical payloads if unchanged
     const currentFingerprint = `${payload.timestamp || ''}_${payload.title || ''}_${payload.componentType || ''}_${(payload.products || []).length}`;
