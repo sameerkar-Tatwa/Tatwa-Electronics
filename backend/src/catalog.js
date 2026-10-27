@@ -1863,6 +1863,24 @@ export function resolveToolRequest(rawInput = {}) {
     } else {
       resolvedList = allProducts;
     }
+
+    // Direct spec filters
+    if (lowerText.includes('14 place') || lowerText.includes('14-place') || lowerText.includes('14s')) {
+      const filtered = resolvedList.filter(p => p.capacity && String(p.capacity).includes('14'));
+      if (filtered.length > 0) resolvedList = filtered;
+    } else if (lowerText.includes('12 place') || lowerText.includes('12-place') || lowerText.includes('12s')) {
+      const filtered = resolvedList.filter(p => p.capacity && String(p.capacity).includes('12'));
+      if (filtered.length > 0) resolvedList = filtered;
+    } else if (lowerText.includes('8 place') || lowerText.includes('8-place') || lowerText.includes('8s') || lowerText.includes('tabletop')) {
+      const filtered = resolvedList.filter(p => p.capacity && String(p.capacity).includes('8'));
+      if (filtered.length > 0) resolvedList = filtered;
+    } else if (lowerText.includes('1400 rpm') || lowerText.includes('1400rpm')) {
+      const filtered = resolvedList.filter(p => (p.motor && String(p.motor).includes('1400')) || (p.description && p.description.includes('1400')));
+      if (filtered.length > 0) resolvedList = filtered;
+    } else if (lowerText.includes('144hz') || lowerText.includes('144 hz')) {
+      const filtered = resolvedList.filter(p => p.refreshRate && String(p.refreshRate).includes('144'));
+      if (filtered.length > 0) resolvedList = filtered;
+    }
   }
 
   const catTitle = category ? (category === 'washing_machine' ? 'Washing Machines' : category === 'tv' ? 'Smart TVs' : category === 'chimney' ? 'Chimneys' : 'Dishwashers') : 'Appliances';
