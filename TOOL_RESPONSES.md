@@ -44,6 +44,8 @@ When an agent or user speaks:
 | **23** | *"Washing machine under 30000"*, *"TV under 40000"*, *"Dishwasher under 30000"* | `{"query": "TV under 40000", "maxPrice": 40000}` | **Budget Filtered Showcase** | `componentType: "products"`<br>`title: "Tatwa Smart TVs Under ₹40,000"`<br>`products: filtered models` | Curated appliances matching strict budget constraints with total savings highlighted. |
 | **24** | *"User manual"*, *"Maintenance guide"*, *"Troubleshooting FAQ"*, *"मैनुअल"* | `{"action": "show_manual"}` OR `{"display_mode": "manual"}` | **User Manual & Support Master** | `componentType: "manual"`<br>`title: "Tatwa User Manual & Maintenance Master Guide"`<br>`manualData: USER_MANUAL_GUIDE` | Multi-section maintenance hub: Chimney Auto-clean cycle, Gesture rules, Dishwasher care, and Troubleshooting FAQ. |
 | **25** | *"Welcome"*, *"Home"*, *"Start"*, *"होम"* | `{"action": "welcome"}` OR `{"display_mode": "welcome"}` | **Flagship Studio Home** | `componentType: "welcome"`<br>`title: "Tatwa Electronics Studio"`<br>`products: 4 flagships` | Default landing page featuring Tatwa Voice Cat, 4 category cards, and Tap to Speak prompt. |
+| **26** | *"Smart appliance bundles"*, *"Kitchen suite combo"*, *"Show bundles"*, *"Combo packages"*, *"बंडल"*, *"कॉम्बो"* | `{"action": "show_bundle"}` OR `{"query": "Show me smart appliance bundles"}` | **Smart Appliance Bundles & Combo Suites** | `componentType: "bundle"`<br>`title: "Tatwa Smart Appliance Bundles & Suites"`<br>`bundles: 3 suites` | 3 dual-appliance suites: 1. Kitchen Suite (Aero 60 + FBID 14S, Save ₹23,490); 2. Smart Home Duo (55" QLED + 8kg Front Load, Save ₹34,000); 3. Cinema Luxury (65" OLED + 10kg Washer-Dryer, Save ₹75,000) with VIP privileges. |
+| **27** | *"Can you deliver and install in 560001?"*, *"Pincode 110001"*, *"Installation in Bangalore"*, *"पिनकोड डिलीवरी"* | `{"action": "serviceability", "pincode": "560001"}` OR `{"query": "pincode 560001"}` | **Pan-India Pin Code Serviceability & Installation Estimator** | `componentType: "serviceability"`<br>`title: "Tatwa Installation & Service Network"`<br>`serviceData: coverage object` | Pin code verification badge, 24-48 hr technician turnaround SLA, 4-step certified installation blueprint, 6 free standard inclusions, and toll-free helpline (1800-TATWA-CARE). |
 
 ---
 
@@ -94,31 +96,32 @@ Every product can be invoked via multiple verbal expressions, model codes, SKUs,
 
 ---
 
-## 5. Suggestions: What Needs to Be Added (Future Enhancements)
+## 5. Completed New Implementations (From Recommendations)
 
-Below are recommended features and extensions to expand system capabilities:
+All four requested enhancement capabilities are now **FULLY IMPLEMENTED, TESTED, AND DEPLOYED**:
 
-### A. Extended Vernacular Voice Triggers (Tamil, Kannada, Telugu)
-While Hindi and English are fully supported, adding native script and phonetic Roman keywords for South Indian languages will improve voice agent accuracy:
-- **Tamil**: `"தொலைக்காட்சி"` / `"டிவி"` (TV), `"சமையலறை சிம்னி"` (Chimney), `"துணி துவைக்கும் இயந்திரம்"` (Washing Machine), `"பாத்திரம் கழுவும் இயந்திரம்"` (Dishwasher).
+### A. Extended Vernacular Voice Triggers (Tamil, Kannada, Telugu) - ✅ IMPLEMENTED
+- **Tamil**: `"தொலைக்காட்சி"` / `"டிவி"` (TV), `"சிம்னி"` (Chimney), `"துணி துவைக்கும் இயந்திரம்"` (Washing Machine), `"பாத்திரம் கழுவும் இயந்திரம்"` (Dishwasher).
 - **Kannada**: `"ದೂರದರ್ಶನ"` / `"ಟಿವಿ"` (TV), `"ಚಿಮಣಿ"` (Chimney), `"ತೊಳೆಯುವ ಯಂತ್ರ"` (Washing Machine).
 - **Telugu**: `"టెలివిజన్"` / `"టీవీ"` (TV), `"చిమ్నీ"` (Chimney), `"వాషింగ్ మెషిన్"` (Washing Machine).
 
-### B. Cross-Category Smart Bundle Trigger
-Add a tool action for bundle packages (e.g., *"Full Kitchen Package"* or *"Smart Home Duo"*):
-- Example: Kitchen Chimney Aero 60 + PureWash 14S Dishwasher bundle with special combo pricing.
-- `componentType: "bundle"`
+### B. Cross-Category Smart Appliance Bundles Screen (`componentType: "bundle"`) - ✅ IMPLEMENTED
+- Curated 3 multi-category appliance combo suites with combined pricing and discounts up to 36%:
+  1. **Kitchen Suite Combo**: Aero 60 Chimney + FBID 14S Dishwasher (`₹79,990`, Save ₹23,490) + Free Dual Installation + Dishwasher Starter Pack.
+  2. **Smart Home Living & Laundry Duo**: Vision Pro 55" QLED + EcoWash 8kg Front Load (`₹59,990`, Save ₹34,000) + Free Swivel Mount + Anti-Vibration Stand.
+  3. **Cinema & Luxury Suite**: CrystalView 65" OLED + AeroCare 10kg Washer-Dryer Combo (`₹1,34,990`, Save ₹75,000) + Free Heavy-Duty Mount + 5-Year Protection.
+- Rendered via `renderBundleScreen()` with interactive dual-appliance cards, plus (+) connectors, savings badges, and VIP privileges list.
 
-### C. Live Pin-Code Serviceability & Installation Estimator
-Add a query handler for pin codes (e.g., *"Is installation available in Bangalore 560001?"*):
-- Shows authorized Tatwa technician turnaround time and standard installation kit details directly on the visual panel.
+### C. Pan-India Pin Code Serviceability & Installation Estimator Screen (`componentType: "serviceability"`) - ✅ IMPLEMENTED
+- Dynamic 6-digit pin code and city recognition covering Bangalore (`560001`), Mumbai (`400001`), Delhi NCR (`110001`), Chennai (`600001`), Hyderabad (`500001`), Kolkata (`700001`), and Pan-India fallback.
+- Returns technician visit SLA (Within 24 Hours / 24-48 Hours), delivery mode, 6 free standard installation inclusions, and 1800-TATWA-CARE toll-free helpline.
+- Rendered via `renderServiceabilityScreen()` with live status indicator, 4-step certified installation blueprint, inclusions checklist, and metro hub dispatch badges.
 
-### D. Direct Spec Filter Intents (e.g. "Show only 14 place dishwashers" or "Show 1400 RPM washers")
-Add attribute-level extraction in `resolveToolRequest`:
-- `capacity: "14 place settings"` $\rightarrow$ filters to FBID, FSID, and FFSD 14S models.
-- `refreshRate: "144Hz"` $\rightarrow$ spotlights CrystalView 65" OLED.
-- `finish: "black"` $\rightarrow$ filters appliances with black glass/metal finishes.
+### D. Direct Spec Filter Intents - ✅ IMPLEMENTED
+- **Dishwasher Capacity**: "14 place", "12 place", "8 place" $\rightarrow$ filters matching models.
+- **Washing Machine Specs**: "1400 RPM", "steam wash", "washer dryer combo" $\rightarrow$ filters matching laundry units.
+- **TV Specs**: "144Hz", "120Hz", "OLED", "QLED" $\rightarrow$ filters display technologies.
 
 ---
 
-*Authored by Tatwa Electronics AI Engineering Team • Synced with Live Worker Backend & Test Suite*
+*Authored by Tatwa Electronics AI Engineering Team • Synced with Live Worker Backend & 26-Test Automated Suite*

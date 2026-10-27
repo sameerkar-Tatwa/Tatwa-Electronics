@@ -963,6 +963,115 @@ export const TV_DISPLAY_GUIDE = {
   ]
 };
 
+export const TATWA_SMART_BUNDLES = [
+  {
+    id: 'bundle-kitchen-suite',
+    name: 'Tatwa Smart Chef Kitchen Suite',
+    subtitle: 'Aero BLDC 60cm Chimney + PureWash FBID 14S Integrated Dishwasher',
+    badge: 'Best-Seller Combo • Extra 10% Off',
+    savingsTag: 'Save ₹23,490 Total',
+    bundlePrice: 79990,
+    combinedMrp: 103480,
+    discountPercent: 23,
+    items: [
+      {
+        product: TATWA_PRODUCT_CATALOG.AERO_60,
+        role: 'Primary Cooker Hood',
+        tag: '1500 m³/hr Suction • Heat Auto-Clean'
+      },
+      {
+        product: TATWA_PRODUCT_CATALOG.FBID_8PR_14S,
+        role: 'Built-in Dishwasher',
+        tag: '14 Place Settings • Dual Zone Wash'
+      }
+    ],
+    perks: [
+      'Free Standard Dual Installation (Worth ₹3,500)',
+      'Free Dishwasher Starter Pack (Salt + Rinse Aid + Tablets)',
+      '12-Year Motor Warranty on Chimney + 10-Year Cavity Warranty on Dishwasher',
+      'Zero Cost EMI Available (from ₹6,666/mo)'
+    ]
+  },
+  {
+    id: 'bundle-smart-home-duo',
+    name: 'Tatwa Complete Smart Home Duo',
+    subtitle: 'Vision Pro 55" 4K QLED Google TV + EcoWash Pro 8kg Inverter Washer',
+    badge: 'Living & Laundry Duo • Save ₹34,000',
+    savingsTag: 'Save ₹34,000 Total',
+    bundlePrice: 59990,
+    combinedMrp: 93980,
+    discountPercent: 36,
+    items: [
+      {
+        product: TATWA_PRODUCT_CATALOG.TV_55_QLED,
+        role: 'Quantum 4K Entertainment',
+        tag: '55" QLED • 120Hz MEMC • 40W Dolby Atmos'
+      },
+      {
+        product: TATWA_PRODUCT_CATALOG.WM_FL8_INV,
+        role: 'Smart Fabric Laundry',
+        tag: '8.0 kg • 1400 RPM • AI Steam 99.9%'
+      }
+    ],
+    perks: [
+      'Free TV Heavy-Duty Swivel Wall Mount (Worth ₹1,999)',
+      'Free Anti-Vibration Washer Stand & Inlet Hoses (Worth ₹1,499)',
+      '3-Year Comprehensive Home Warranty on both appliances',
+      'Same-Day Delivery & Express Next-Day Installation'
+    ]
+  },
+  {
+    id: 'bundle-cinema-luxury-suite',
+    name: 'Tatwa Cinema & All-in-One Suite',
+    subtitle: 'CrystalView 65" Cinema OLED TV + AeroCare 10kg Washer-Dryer Combo',
+    badge: 'Flagship Luxury Tier • Save ₹75,000',
+    savingsTag: 'Save ₹75,000 Total',
+    bundlePrice: 134990,
+    combinedMrp: 209980,
+    discountPercent: 36,
+    items: [
+      {
+        product: TATWA_PRODUCT_CATALOG.TV_65_OLED,
+        role: 'Flagship Cinema OLED',
+        tag: '65" Self-Lit OLED • 144Hz VRR • 60W Soundbar'
+      },
+      {
+        product: TATWA_PRODUCT_CATALOG.WM_WD10_AI,
+        role: 'All-in-One Washer-Dryer',
+        tag: '10kg Wash + 7kg 100% Dry • Direct Motion Inverter'
+      }
+    ],
+    perks: [
+      'VIP White-Glove Installation by Certified Senior Engineers',
+      'Free HDMI 2.1 Ultra High Speed 48Gbps Cable (Worth ₹2,499)',
+      '5-Year Extended Panel Warranty & 12-Year Motor Warranty',
+      'Dedicated Priority Customer Service Concierge Line'
+    ]
+  }
+];
+
+export const TATWA_SERVICEABILITY_DIRECTORY = {
+  defaultCity: 'Pan-India Service Network',
+  coverageHubs: [
+    { city: 'Bangalore', state: 'Karnataka', pincodes: ['560001', '560002', '560004', '560025', '560034', '560037', '560068', '560100', '560102', '560103'], turnaround: 'Within 24 Hours', deliveryType: 'Same-Day / Next-Day Express' },
+    { city: 'Mumbai', state: 'Maharashtra', pincodes: ['400001', '400002', '400050', '400051', '400053', '400076', '400088'], turnaround: 'Within 24 Hours', deliveryType: 'Next-Day Express' },
+    { city: 'Delhi NCR', state: 'Delhi', pincodes: ['110001', '110002', '110019', '110020', '110024', '110092', '122001', '201301'], turnaround: 'Within 24 Hours', deliveryType: 'Same-Day / Next-Day Express' },
+    { city: 'Chennai', state: 'Tamil Nadu', pincodes: ['600001', '600002', '600028', '600034', '600040', '600096'], turnaround: 'Within 24 to 48 Hours', deliveryType: 'Express Delivery' },
+    { city: 'Hyderabad', state: 'Telangana', pincodes: ['500001', '500003', '500032', '500034', '500081', '500084'], turnaround: 'Within 24 Hours', deliveryType: 'Next-Day Express' },
+    { city: 'Kolkata', state: 'West Bengal', pincodes: ['700001', '700019', '700020', '700091'], turnaround: 'Within 24 to 48 Hours', deliveryType: 'Standard Express' }
+  ],
+  standardInclusions: [
+    'Free Unboxing and Pre-Installation Site Inspection',
+    'Certified Installation by Authorized Tatwa Engineers',
+    'Standard Wall Mounting and Levelling Alignment',
+    'Duct & Water Connection using OEM certified accessories',
+    'Comprehensive Operational Demo & In-Person Walkthrough',
+    'Instant Digital Warranty Activation with Tatwa Care'
+  ],
+  helpline: '1800-TATWA-CARE (1800-828-9227)',
+  operatingHours: '9:00 AM – 9:00 PM (Monday through Sunday)'
+};
+
 // ============================================================================
 // 3. CORE HELPER FUNCTIONS
 // ============================================================================
@@ -1048,8 +1157,14 @@ export function resolveToolRequest(rawInput = {}) {
       lowerText.includes('utensil') ||
       lowerText.includes('fbid') ||
       lowerText.includes('fsid') ||
+      lowerText.includes('fsid') ||
       lowerText.includes('ffsd') ||
-      lowerText.includes('place setting')
+      lowerText.includes('place setting') ||
+      lowerText.includes('பாத்திரம்') ||
+      lowerText.includes('டிஷ்வாஷர்') ||
+      lowerText.includes('ಪಾತ್ರೆ') ||
+      lowerText.includes('ಡಿಶ್‌ವಾಷರ್') ||
+      lowerText.includes('డిష్‌వాషర్')
     ) {
       category = 'dishwasher';
     } else if (
@@ -1064,7 +1179,10 @@ export function resolveToolRequest(rawInput = {}) {
       lowerText.includes('aerocare') ||
       lowerText.includes('aquaspin') ||
       lowerText.includes('कपड़े') ||
-      lowerText.includes('वाशिंग मशीन')
+      lowerText.includes('वाशिंग मशीन') ||
+      lowerText.includes('துணி துவைக்கும்') ||
+      lowerText.includes('ವಾಷಿಂಗ್') ||
+      lowerText.includes('వాషింగ్')
     ) {
       category = 'washing_machine';
     } else if (
@@ -1073,7 +1191,13 @@ export function resolveToolRequest(rawInput = {}) {
       lowerText.includes('टेलीविजन') ||
       lowerText.includes('crystalview') ||
       lowerText.includes('vision pro') ||
-      lowerText.includes('nova')
+      lowerText.includes('nova') ||
+      lowerText.includes('தொலைக்காட்சி') ||
+      lowerText.includes('டிவி') ||
+      lowerText.includes('ದೂರದರ್ಶನ') ||
+      lowerText.includes('ಟಿವಿ') ||
+      lowerText.includes('టెలివిజన్') ||
+      lowerText.includes('టీవీ')
     ) {
       category = 'tv';
     } else if (
@@ -1083,7 +1207,10 @@ export function resolveToolRequest(rawInput = {}) {
       lowerText.includes('suction') ||
       lowerText.includes('bldc') ||
       lowerText.includes('aero') ||
-      lowerText.includes('auto clean')
+      lowerText.includes('auto clean') ||
+      lowerText.includes('சிம்னி') ||
+      lowerText.includes('ಚಿಮಣಿ') ||
+      lowerText.includes('చిమ్నీ')
     ) {
       category = 'chimney';
     }
@@ -1111,6 +1238,10 @@ export function resolveToolRequest(rawInput = {}) {
     action = 'show_manual';
   } else if (displayMode === 'offers' || displayMode === 'deals') {
     action = 'show_offers';
+  } else if (displayMode === 'bundle' || displayMode === 'bundles') {
+    action = 'show_bundle';
+  } else if (displayMode === 'serviceability' || displayMode === 'pincode') {
+    action = 'serviceability';
   } else if (displayMode === 'welcome') {
     action = 'welcome';
   } else if (displayMode === 'single') {
@@ -1119,6 +1250,40 @@ export function resolveToolRequest(rawInput = {}) {
     action = 'sequence';
   } else if (action === 'welcome' || lowerText.includes('welcome') || lowerText.includes('होम') || lowerText.includes('home')) {
     action = 'welcome';
+  } else if (
+    displayMode === 'bundle' ||
+    action === 'bundle' ||
+    action === 'show_bundle' ||
+    lowerText.includes('bundle') ||
+    lowerText.includes('package') ||
+    lowerText.includes('combo') ||
+    lowerText.includes('kitchen suite') ||
+    lowerText.includes('home duo') ||
+    lowerText.includes('luxury suite') ||
+    lowerText.includes('कॉम्बो') ||
+    lowerText.includes('बंडल') ||
+    lowerText.includes('பண்டில்') ||
+    lowerText.includes('ಬಂಡಲ್') ||
+    lowerText.includes('బండిల్')
+  ) {
+    action = 'show_bundle';
+  } else if (
+    action === 'serviceability' ||
+    action === 'check_pincode' ||
+    action === 'pincode' ||
+    action === 'installation_estimator' ||
+    /\b\d{6}\b/.test(lowerText) ||
+    lowerText.includes('pincode') ||
+    lowerText.includes('pin code') ||
+    lowerText.includes('serviceability') ||
+    lowerText.includes('delivery') ||
+    lowerText.includes('installation charges') ||
+    lowerText.includes('can you deliver') ||
+    lowerText.includes('can you install') ||
+    lowerText.includes('पिनकोड') ||
+    lowerText.includes('डिलीवरी')
+  ) {
+    action = 'serviceability';
   } else if (
     /\b(compare|comparison|comparing|versus|vs|diff|difference)\b/i.test(lowerText) ||
     lowerText.includes('कंपेयर') ||
@@ -1156,6 +1321,103 @@ export function resolveToolRequest(rawInput = {}) {
         TATWA_PRODUCT_CATALOG.FFSD_7PR_14S_BK,
         TATWA_PRODUCT_CATALOG.WM_FL8_INV,
         TATWA_PRODUCT_CATALOG.TV_55_QLED
+      ]
+    };
+  }
+
+  // ==========================================================================
+  // VIEW 0B: SMART APPLIANCE BUNDLES & COMBO SUITES
+  // ==========================================================================
+  if (action === 'show_bundle' || action === 'bundle') {
+    return {
+      componentType: 'bundle',
+      title: 'Tatwa Smart Appliance Bundles & Suites',
+      subtitle: 'Exclusive dual-appliance packages with up to 36% discount and free VIP installation',
+      bundles: TATWA_SMART_BUNDLES,
+      products: [
+        TATWA_PRODUCT_CATALOG.AERO_60,
+        TATWA_PRODUCT_CATALOG.FBID_8PR_14S,
+        TATWA_PRODUCT_CATALOG.TV_55_QLED,
+        TATWA_PRODUCT_CATALOG.WM_FL8_INV
+      ],
+      images: [
+        {
+          name: 'Kitchen Suite Combo',
+          title: 'Aero 60 Chimney + FBID 14S Dishwasher',
+          imageUrl: 'images/chimney_curved_glass.jpg',
+          description: 'Special Combo: ₹79,990 (Save ₹23,490 Total)'
+        },
+        {
+          name: 'Smart Home Duo',
+          title: 'Vision Pro 55" QLED + EcoWash 8kg Washer',
+          imageUrl: 'images/tv_qled_55inch.jpg',
+          description: 'Special Combo: ₹59,990 (Save ₹34,000 Total)'
+        }
+      ]
+    };
+  }
+
+  // ==========================================================================
+  // VIEW 0C: PIN-CODE SERVICEABILITY & INSTALLATION ESTIMATOR
+  // ==========================================================================
+  if (action === 'serviceability' || action === 'check_pincode' || action === 'pincode') {
+    const pinMatch = lowerText.match(/\b(\d{6})\b/);
+    const pin = pinMatch ? pinMatch[1] : (merged.pincode || merged.pin || '560001');
+
+    let matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs.find(h =>
+      h.pincodes.includes(pin) ||
+      lowerText.includes(h.city.toLowerCase()) ||
+      lowerText.includes(h.state.toLowerCase())
+    );
+
+    if (!matchedHub) {
+      if (lowerText.includes('bangalore') || lowerText.includes('bengaluru')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[0];
+      } else if (lowerText.includes('mumbai') || lowerText.includes('bombay')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[1];
+      } else if (lowerText.includes('delhi') || lowerText.includes('ncr') || lowerText.includes('gurgaon') || lowerText.includes('noida')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[2];
+      } else if (lowerText.includes('chennai') || lowerText.includes('madras')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[3];
+      } else if (lowerText.includes('hyderabad')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[4];
+      } else if (lowerText.includes('kolkata') || lowerText.includes('calcutta')) {
+        matchedHub = TATWA_SERVICEABILITY_DIRECTORY.coverageHubs[5];
+      } else {
+        matchedHub = {
+          city: 'Pan-India Service Hub',
+          state: 'Standard Coverage',
+          turnaround: 'Within 24 to 48 Hours',
+          deliveryType: 'Express Delivery (Air/Surface)'
+        };
+      }
+    }
+
+    return {
+      componentType: 'serviceability',
+      title: `Tatwa Installation & Service Network (${matchedHub.city})`,
+      subtitle: `PIN Code ${pin} • Certified Technician Visit ${matchedHub.turnaround} • Free Standard Installation`,
+      serviceData: {
+        pincode: pin,
+        city: matchedHub.city,
+        state: matchedHub.state,
+        turnaround: matchedHub.turnaround,
+        deliveryType: matchedHub.deliveryType,
+        inclusions: TATWA_SERVICEABILITY_DIRECTORY.standardInclusions,
+        helpline: TATWA_SERVICEABILITY_DIRECTORY.helpline,
+        operatingHours: TATWA_SERVICEABILITY_DIRECTORY.operatingHours
+      },
+      products: [
+        TATWA_PRODUCT_CATALOG.AERO_60,
+        TATWA_PRODUCT_CATALOG.FBID_8PR_14S
+      ],
+      images: [
+        {
+          name: 'Installation Service Network',
+          title: `Tatwa Certified Care - ${matchedHub.city}`,
+          imageUrl: 'images/chimney_installation_hero.jpg',
+          description: `Turnaround: ${matchedHub.turnaround} • Free Standard Installation`
+        }
       ]
     };
   }

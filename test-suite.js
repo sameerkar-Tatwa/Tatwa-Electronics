@@ -439,13 +439,48 @@ const tests = [
         res.body.displayedProducts[0].sku === 'TE-TV-551-QLED' &&
         res.body.displayedProducts[1].sku === 'TE-TV-651-OLED';
     }
+  },
+  {
+    id: 'TC-25',
+    name: 'Smart Appliance Bundles & Combo Suites',
+    description: 'Returns bundle component with 3 curated appliance suites, dual specs, and VIP perks',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "Show me smart appliance bundles and kitchen combo suites" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'bundle' &&
+        Array.isArray(res.body.bundles) &&
+        res.body.bundles.length >= 3 &&
+        res.body.bundles[0].id === 'bundle-kitchen-suite';
+    }
+  },
+  {
+    id: 'TC-26',
+    name: 'Pan-India Pin Code Serviceability & Installation Estimator',
+    description: 'Resolves 6-digit pin code 560001 to Bangalore hub with technician SLA and free installation',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "Can you install and deliver to pincode 560001?" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'serviceability' &&
+        res.body.serviceData &&
+        res.body.serviceData.pincode === '560001' &&
+        res.body.serviceData.city === 'Bangalore' &&
+        Array.isArray(res.body.serviceData.inclusions);
+    }
   }
 ];
 
 // Runner
 async function runTestSuite() {
   console.log('===============================================================');
-  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (24 TEST CASES)`);
+  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (26 TEST CASES)`);
   console.log(`Target: ${BASE_URL}`);
   console.log('===============================================================\n');
 

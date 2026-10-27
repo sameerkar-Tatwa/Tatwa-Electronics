@@ -639,6 +639,18 @@
       return;
     }
 
+    if (compType === 'bundle' || payload.action === 'show_bundle' || payload.action === 'bundle') {
+      updateDisplayBadge('Smart Appliance Bundles');
+      renderBundleScreen(container, payload.bundles);
+      return;
+    }
+
+    if (compType === 'serviceability' || compType === 'pincode' || payload.action === 'check_pincode' || payload.action === 'serviceability') {
+      updateDisplayBadge('Pincode & Installation');
+      renderServiceabilityScreen(container, payload.serviceData);
+      return;
+    }
+
     if (
       compType === 'washing-machine-guide' ||
       payload.action === 'washing_machine_guide' ||
@@ -655,13 +667,13 @@
       updateDisplayBadge('Smart TV Guide');
       renderTVDisplayGuide(container, payload.guideData);
       return;
-    } else if (compType === 'installation' ||
+    } else if (
+      compType === 'installation' ||
       compType === 'chimney-installation' ||
       compType === 'chimney_installation' ||
       payload.action === 'installation' ||
       payload.action === 'chimney_installation' ||
-      (payload.title && payload.title.toLowerCase().includes('installation')) ||
-      (payload.query && payload.query.toLowerCase().includes('install'))
+      (payload.title && payload.title.toLowerCase().includes('chimney installation'))
     ) {
       updateDisplayBadge('Installation Guide');
       renderChimneyInstallation(container);
@@ -2276,6 +2288,352 @@
         </section>
       </div>
     `;
+  }
+
+  // ==========================================================================
+  // COMPONENT D1: SMART APPLIANCE BUNDLES & COMBO SUITES
+  // ==========================================================================
+  function renderBundleScreen(container, bundles) {
+    if (!container) return;
+    prepareViewTransition(container);
+
+    if (displaySubtitle) {
+      displaySubtitle.textContent = 'Curated Dual-Appliance Suites • Extra Bundle Discounts • Free VIP Dual Installation';
+    }
+
+    const bundleList = (bundles && bundles.length > 0) ? bundles : [
+      {
+        id: 'bundle-kitchen-suite',
+        name: 'Tatwa Smart Chef Kitchen Suite',
+        subtitle: 'Aero BLDC 60cm Chimney + PureWash FBID 14S Integrated Dishwasher',
+        badge: 'Best-Seller Combo • Extra 10% Off',
+        savingsTag: 'Save ₹23,490 Total',
+        bundlePrice: 79990,
+        combinedMrp: 103480,
+        discountPercent: 23,
+        items: [
+          {
+            name: 'Tatwa Aero BLDC 60 cm',
+            role: 'Primary Cooker Hood',
+            tag: '1500 m³/hr Suction • Heat Auto-Clean',
+            imageUrl: 'images/chimney_curved_glass.jpg'
+          },
+          {
+            name: 'Tatwa PureWash FBID 14S Integrated',
+            role: 'Built-in Dishwasher',
+            tag: '14 Place Settings • Dual Zone Wash',
+            imageUrl: 'images/dishwasher_integrated.jpg'
+          }
+        ],
+        perks: [
+          'Free Standard Dual Installation (Worth ₹3,500)',
+          'Free Dishwasher Starter Pack (Salt + Rinse Aid + Tablets)',
+          '12-Year Motor Warranty on Chimney + 10-Year Cavity Warranty on Dishwasher',
+          'Zero Cost EMI Available (from ₹6,666/mo)'
+        ]
+      },
+      {
+        id: 'bundle-smart-home-duo',
+        name: 'Tatwa Complete Smart Home Duo',
+        subtitle: 'Vision Pro 55" 4K QLED Google TV + EcoWash Pro 8kg Inverter Washer',
+        badge: 'Living & Laundry Duo • Save ₹34,000',
+        savingsTag: 'Save ₹34,000 Total',
+        bundlePrice: 59990,
+        combinedMrp: 93980,
+        discountPercent: 36,
+        items: [
+          {
+            name: 'Tatwa Vision Pro 55" 4K QLED Google TV',
+            role: 'Quantum 4K Entertainment',
+            tag: '55" QLED • 120Hz MEMC • 40W Dolby Atmos',
+            imageUrl: 'images/tv_qled_55inch.jpg'
+          },
+          {
+            name: 'Tatwa EcoWash Pro 8 kg Front Load',
+            role: 'Smart Fabric Laundry',
+            tag: '8.0 kg • 1400 RPM • AI Steam 99.9%',
+            imageUrl: 'images/wm_front_load_8kg.jpg'
+          }
+        ],
+        perks: [
+          'Free TV Heavy-Duty Swivel Wall Mount (Worth ₹1,999)',
+          'Free Anti-Vibration Washer Stand & Inlet Hoses (Worth ₹1,499)',
+          '3-Year Comprehensive Home Warranty on both appliances',
+          'Same-Day Delivery & Express Next-Day Installation'
+        ]
+      },
+      {
+        id: 'bundle-cinema-luxury-suite',
+        name: 'Tatwa Cinema & All-in-One Suite',
+        subtitle: 'CrystalView 65" Cinema OLED TV + AeroCare 10kg Washer-Dryer Combo',
+        badge: 'Flagship Luxury Tier • Save ₹75,000',
+        savingsTag: 'Save ₹75,000 Total',
+        bundlePrice: 134990,
+        combinedMrp: 209980,
+        discountPercent: 36,
+        items: [
+          {
+            name: 'Tatwa CrystalView 65" Cinema OLED TV',
+            role: 'Flagship Cinema OLED',
+            tag: '65" Self-Lit OLED • 144Hz VRR • 60W Soundbar',
+            imageUrl: 'images/tv_oled_65inch.jpg'
+          },
+          {
+            name: 'Tatwa AeroCare 10 kg AI Washer-Dryer',
+            role: 'All-in-One Washer-Dryer',
+            tag: '10kg Wash + 7kg 100% Dry • Direct Motion Inverter',
+            imageUrl: 'images/wm_washer_dryer_10kg.jpg'
+          }
+        ],
+        perks: [
+          'VIP White-Glove Installation by Certified Senior Engineers',
+          'Free HDMI 2.1 Ultra High Speed 48Gbps Cable (Worth ₹2,499)',
+          '5-Year Extended Panel Warranty & 12-Year Motor Warranty',
+          'Dedicated Priority Customer Service Concierge Line'
+        ]
+      }
+    ];
+
+    container.innerHTML = `
+      <div class="bundle-suite-container">
+        <header class="bundle-master-header">
+          <div class="bundle-header-left">
+            <button class="btn-back-home-pill" id="btn-back-bundle" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
+            </div>
+            <h1 class="bundle-main-title">TATWA SMART APPLIANCE SUITES &amp; COMBOS</h1>
+            <div class="bundle-sub-title">COMBINED EFFICIENCY • DUAL-PRODUCT PACKAGES • UP TO 36% DISCOUNT</div>
+          </div>
+          <div class="bundle-header-badge-pill">
+            <span>✨ Festive Bundle Perks Active</span>
+          </div>
+        </header>
+
+        <div class="bundle-cards-grid">
+          ${bundleList.map((b, idx) => {
+            const price = Number(b.bundlePrice || 0);
+            const mrp = Number(b.combinedMrp || 0);
+            const savings = mrp > price ? mrp - price : 0;
+            const items = b.items || [];
+            const itemA = items[0] ? (items[0].product || items[0]) : {};
+            const itemB = items[1] ? (items[1].product || items[1]) : {};
+
+            return `
+              <div class="bundle-card ${idx === 0 ? 'bundle-card-featured' : ''}">
+                <div class="bundle-card-banner">
+                  <span class="bundle-badge">${b.badge || 'Smart Bundle Combo'}</span>
+                  <span class="bundle-savings-pill">${b.savingsTag || `Save ₹${savings.toLocaleString('en-IN')}`}</span>
+                </div>
+
+                <div class="bundle-card-body">
+                  <h3 class="bundle-title">${b.name}</h3>
+                  <p class="bundle-subtitle">${b.subtitle || ''}</p>
+
+                  <div class="bundle-duo-showcase">
+                    <div class="bundle-appliance-item">
+                      <div class="bundle-thumb-wrap">
+                        <img src="${itemA.imageUrl || 'images/chimney_curved_glass.jpg'}" alt="${itemA.name || 'Appliance A'}" />
+                      </div>
+                      <div class="bundle-item-info">
+                        <div class="bundle-item-role">${items[0]?.role || 'Appliance 1'}</div>
+                        <h4 class="bundle-item-name">${itemA.name || 'Tatwa Appliance'}</h4>
+                        <span class="bundle-item-tag">${items[0]?.tag || itemA.highlight || ''}</span>
+                      </div>
+                    </div>
+
+                    <div class="bundle-plus-badge">+</div>
+
+                    <div class="bundle-appliance-item">
+                      <div class="bundle-thumb-wrap">
+                        <img src="${itemB.imageUrl || 'images/dishwasher_integrated.jpg'}" alt="${itemB.name || 'Appliance B'}" />
+                      </div>
+                      <div class="bundle-item-info">
+                        <div class="bundle-item-role">${items[1]?.role || 'Appliance 2'}</div>
+                        <h4 class="bundle-item-name">${itemB.name || 'Tatwa Appliance'}</h4>
+                        <span class="bundle-item-tag">${items[1]?.tag || itemB.highlight || ''}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bundle-pricing-row">
+                    <div class="bundle-price-box">
+                      <span class="bundle-price-label">Bundle Price</span>
+                      <span class="bundle-price-val">₹${price.toLocaleString('en-IN')}</span>
+                      ${mrp > price ? `<span class="bundle-price-mrp">Total MRP ₹${mrp.toLocaleString('en-IN')}</span>` : ''}
+                    </div>
+                    <div class="bundle-discount-badge">
+                      <span>${b.discountPercent || Math.round((savings / mrp) * 100)}% OFF</span>
+                    </div>
+                  </div>
+
+                  <div class="bundle-perks-box">
+                    <div class="bundle-perks-title">Included Bundle Privileges</div>
+                    <ul class="bundle-perks-list">
+                      ${(b.perks || []).map(p => `<li><span class="perk-check">✓</span> ${p}</li>`).join('')}
+                    </ul>
+                  </div>
+
+                  <div class="bundle-actions">
+                    <button class="btn-bundle-order" data-bundle="${b.id}">
+                      <span>Inquire About Bundle →</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    const btnBack = container.querySelector('#btn-back-bundle');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
+    }
+
+    container.querySelectorAll('.btn-bundle-order').forEach(btn => {
+      btn.addEventListener('click', () => {
+        showToast('Agent notified of bundle inquiry!');
+      });
+    });
+  }
+
+  // ==========================================================================
+  // COMPONENT D2: PAN-INDIA PINCODE SERVICEABILITY & INSTALLATION ESTIMATOR
+  // ==========================================================================
+  function renderServiceabilityScreen(container, serviceData) {
+    if (!container) return;
+    prepareViewTransition(container);
+
+    const data = serviceData || {
+      pincode: '560001',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      turnaround: 'Within 24 Hours',
+      deliveryType: 'Same-Day / Next-Day Express',
+      inclusions: [
+        'Free Unboxing and Pre-Installation Site Inspection',
+        'Certified Installation by Authorized Tatwa Engineers',
+        'Standard Wall Mounting and Levelling Alignment',
+        'Duct & Water Connection using OEM certified accessories',
+        'Comprehensive Operational Demo & In-Person Walkthrough',
+        'Instant Digital Warranty Activation with Tatwa Care'
+      ],
+      helpline: '1800-TATWA-CARE (1800-828-9227)',
+      operatingHours: '9:00 AM – 9:00 PM (Monday through Sunday)'
+    };
+
+    if (displaySubtitle) {
+      displaySubtitle.textContent = `Pincode ${data.pincode} Verified • Authorized Tatwa Technician Visit ${data.turnaround}`;
+    }
+
+    container.innerHTML = `
+      <div class="serviceability-container">
+        <header class="service-master-header">
+          <div class="service-header-left">
+            <button class="btn-back-home-pill" id="btn-back-service" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
+            </div>
+            <h1 class="service-main-title">PAN-INDIA CERTIFIED INSTALLATION &amp; SERVICE NETWORK</h1>
+            <div class="service-sub-title">FACTORY CERTIFIED ENGINEERS • 24–48 HOUR VISITS • FREE STANDARD INSTALLATION</div>
+          </div>
+          <div class="service-status-pill">
+            <span class="status-dot-pulse"></span>
+            <span>Service Active in Your Area</span>
+          </div>
+        </header>
+
+        <div class="service-spotlight-card">
+          <div class="service-spotlight-top">
+            <div class="service-pincode-pill">
+              <span class="pin-icon">📍</span>
+              <strong>PIN CODE: ${data.pincode}</strong>
+              <span class="pin-city">(${data.city}, ${data.state})</span>
+            </div>
+            <div class="service-sla-tags">
+              <span class="sla-badge sla-turnaround">⏱ Technician Visit: ${data.turnaround}</span>
+              <span class="sla-badge sla-delivery">🚚 Delivery: ${data.deliveryType}</span>
+            </div>
+          </div>
+
+          <div class="service-steps-grid">
+            <div class="service-step-item">
+              <div class="service-step-num">01</div>
+              <div class="service-step-content">
+                <h4>Free Site Inspection</h4>
+                <p>Electrical line, water inlet pressure, and wall masonry audit prior to unboxing.</p>
+              </div>
+            </div>
+            <div class="service-step-item">
+              <div class="service-step-num">02</div>
+              <div class="service-step-content">
+                <h4>Certified Installation</h4>
+                <p>Factory-trained engineers use laser leveling and anti-vibration OEM mounting brackets.</p>
+              </div>
+            </div>
+            <div class="service-step-item">
+              <div class="service-step-num">03</div>
+              <div class="service-step-content">
+                <h4>Live Operational Demo</h4>
+                <p>Step-by-step training on gesture controls, heat auto-clean, steam wash, and detergent use.</p>
+              </div>
+            </div>
+            <div class="service-step-item">
+              <div class="service-step-num">04</div>
+              <div class="service-step-content">
+                <h4>Instant Cloud Warranty</h4>
+                <p>QR code registration for 10-to-12 year motor/cavity warranties on the spot.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-details-row">
+          <div class="service-inclusions-card">
+            <h3 class="service-card-title">Standard Free Installation Inclusions</h3>
+            <ul class="service-inclusions-list">
+              ${(data.inclusions || []).map(inc => `<li><span class="inc-check">✓</span> ${inc}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="service-support-card">
+            <h3 class="service-card-title">Tatwa Care Support Helpline</h3>
+            <div class="helpline-number-box">
+              <span class="helpline-icon">📞</span>
+              <div class="helpline-details">
+                <span class="helpline-label">Toll-Free Helpline</span>
+                <strong class="helpline-val">${data.helpline}</strong>
+                <span class="helpline-timing">${data.operatingHours}</span>
+              </div>
+            </div>
+            <div class="coverage-cities-box">
+              <span class="cities-label">Metro Hubs with 24-Hour Express Dispatch:</span>
+              <div class="cities-pills">
+                <span class="city-pill">Bangalore</span>
+                <span class="city-pill">Mumbai</span>
+                <span class="city-pill">Delhi NCR</span>
+                <span class="city-pill">Chennai</span>
+                <span class="city-pill">Hyderabad</span>
+                <span class="city-pill">Kolkata</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const btnBack = container.querySelector('#btn-back-service');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
+    }
   }
 
   // Component E: Offers & Deals Showcase (Inspired by Tatwa Reference Mockup 3)
@@ -4072,10 +4430,8 @@
       // Direct UI update fallback if SSE is delayed or reconnecting
       if (result && (result.componentType || result.displayedProducts)) {
         handleIncomingImages({
-          componentType: result.componentType || 'products',
-          title: result.title,
-          subtitle: result.subtitle || `Triggered: ${payload.action || payload.query || payload.category || 'Appliance Showcase'}`,
-          products: result.displayedProducts || []
+          ...result,
+          products: result.displayedProducts || result.products || []
         });
       }
     } catch (err) {
@@ -4372,10 +4728,8 @@
           // Direct UI update fallback
           if (result && result.componentType) {
             handleIncomingImages({
-              componentType: result.componentType,
-              title: result.title,
-              subtitle: `Triggered by Visualizer Setting Tool (${payload.display_mode})`,
-              products: result.displayedProducts || []
+              ...result,
+              products: result.displayedProducts || result.products || []
             });
           }
         } catch (err) {
