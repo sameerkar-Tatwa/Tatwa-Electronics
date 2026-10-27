@@ -63,7 +63,7 @@ export default {
       const rawPk = env.ORATION_PUBLIC_KEY || '';
       const rawAg = env.ORATION_AGENT_ID || '';
       const pk = (!rawPk || rawPk.startsWith('pk_your_')) ? '70588826-0a19-4c4f-abdf-6de6c720d793' : rawPk;
-      const ag = (!rawAg || rawAg.startsWith('ag_your_')) ? '538568f1-6a55-4e3f-989c-164f391a8443' : rawAg;
+      const ag = (!rawAg || rawAg.startsWith('ag_your_')) ? '128f59b2-7f37-4e1f-badd-f18c7a2a2287' : rawAg;
 
       return new Response(
         JSON.stringify({

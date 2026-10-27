@@ -296,7 +296,7 @@
       let pk = config.publicKey || '';
       let ag = config.agentId || '';
       if (!pk || pk.startsWith('pk_your_')) pk = '70588826-0a19-4c4f-abdf-6de6c720d793';
-      if (!ag || ag.startsWith('ag_your_')) ag = '538568f1-6a55-4e3f-989c-164f391a8443';
+      if (!ag || ag.startsWith('ag_your_')) ag = '128f59b2-7f37-4e1f-badd-f18c7a2a2287';
 
       if (widgetMountPoint) {
         widgetMountPoint.innerHTML = '';
