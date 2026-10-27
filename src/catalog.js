@@ -1745,36 +1745,74 @@ export function resolveToolRequest(rawInput = {}) {
     }
 
     // If no explicit product list was passed, attempt to extract mentioned products from text
-    if (toCompare.length < 2 && lowerText) {
-      // Check for specific TV mentions
-      if (category === 'tv' || lowerText.includes('tv') || lowerText.includes('टीवी')) {
+    const compareText = (lowerText || '').replace(/,/g, '');
+    if (toCompare.length < 2 && compareText) {
+      // Check for specific TV mentions by name, size or price
+      if (category === 'tv' || compareText.includes('tv') || compareText.includes('टीवी')) {
         const found = [];
-        if (/\b(tv\s*1|55\s*inch|55"|qled|vision\s*pro)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_55_QLED);
-        if (/\b(tv\s*2|65\s*inch|65"|oled|crystalview)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_65_OLED);
-        if (/\b(tv\s*3|43\s*inch|43"|uhd|frameless|nova)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.TV_43_UHD);
+        if (/\b(tv\s*1|55\s*inch|55"|qled|vision\s*pro|36\s*000|36000|36\s*k|37\s*000|37000|36990|chhatis|chattis)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.TV_55_QLED);
+        if (/\b(tv\s*2|65\s*inch|65"|oled|crystalview|99\s*000|99000|99\s*k|1\s*lakh|100000|99990|ninyanve|lakh)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.TV_65_OLED);
+        if (/\b(tv\s*3|43\s*inch|43"|uhd|frameless|nova|21\s*000|21000|22\s*000|22000|21990|ikkis|baees)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.TV_43_UHD);
         if (found.length >= 2) {
           toCompare = found;
         }
       }
-      // Check for specific chimney mentions
-      if (category === 'chimney' || lowerText.includes('chimney') || lowerText.includes('चिमनी')) {
+      // Check for specific chimney mentions by size or price
+      if (category === 'chimney' || compareText.includes('chimney') || compareText.includes('चिमनी')) {
         const found = [];
-        if (/\b(chimney\s*1|60\s*cm|60cm|aero\s*60)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_60);
-        if (/\b(chimney\s*2|75\s*cm|75cm|aero\s*75)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_75);
-        if (/\b(chimney\s*3|90\s*cm|90cm|aero\s*90)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.AERO_90);
+        if (/\b(chimney\s*1|60\s*cm|60cm|aero\s*60|21\s*000|21000|21330)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.AERO_60);
+        if (/\b(chimney\s*2|75\s*cm|75cm|aero\s*75|23\s*000|23000|23118)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.AERO_75);
+        if (/\b(chimney\s*3|90\s*cm|90cm|aero\s*90|24\s*000|25\s*000|24987)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.AERO_90);
         if (found.length >= 2) {
           toCompare = found;
         }
       }
-      // Check for specific washing machine mentions
-      if (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('कपड़े')) {
+      // Check for specific washing machine mentions by type, capacity or price
+      if (category === 'washing_machine' || compareText.includes('wash') || compareText.includes('कपड़े') || compareText.includes('मशीन')) {
         const found = [];
-        if (/\b(wm\s*1|washing\s*machine\s*1|front\s*load|ecowash|8\s*kg|8kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_FL8_INV);
-        if (/\b(wm\s*2|washing\s*machine\s*2|top\s*load|hydropulse|7\.5\s*kg|7\.5kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_TL75_SMT);
-        if (/\b(wm\s*3|washing\s*machine\s*3|washer\s*dryer|aerocare|combo|10\s*kg|10kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_WD10_AI);
-        if (/\b(wm\s*4|washing\s*machine\s*4|semi\s*automatic|twin\s*tub|aquaspin|6\.5\s*kg|6\.5kg)\b/i.test(lowerText)) found.push(TATWA_PRODUCT_CATALOG.WM_SA65_TT);
+        if (/\b(wm\s*1|washing\s*machine\s*1|front\s*load|ecowash|8\s*kg|8kg|27\s*000|27000|27490|sattais)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.WM_FL8_INV);
+        if (/\b(wm\s*2|washing\s*machine\s*2|top\s*load|hydropulse|7\.5\s*kg|7\.5kg|17\s*000|18\s*000|17990|satrah|atharah)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.WM_TL75_SMT);
+        if (/\b(wm\s*3|washing\s*machine\s*3|washer\s*dryer|aerocare|combo|10\s*kg|10kg|44\s*000|45\s*000|44990|chawalis|paitalis)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.WM_WD10_AI);
+        if (/\b(wm\s*4|washing\s*machine\s*4|semi\s*automatic|twin\s*tub|aquaspin|6\.5\s*kg|6\.5kg|9\s*990|10\s*000|nau\s*hazar|das\s*hazar)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.WM_SA65_TT);
         if (found.length >= 2) {
           toCompare = found;
+        }
+      }
+      // Check for specific dishwasher mentions by type, capacity or price
+      if (category === 'dishwasher' || compareText.includes('dishwasher') || compareText.includes('डिशवॉशर')) {
+        const found = [];
+        if (/\b(dishwasher\s*1|built\s*in|integrated|fbid|63\s*000|64\s*000|63901)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FBID_8PR_14S);
+        if (/\b(dishwasher\s*2|semi\s*integrated|fsid|58\s*000|59\s*000|58617)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FSID_8PR_14S);
+        if (/\b(dishwasher\s*3|freestanding\s*inox|52\s*000|52170)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FFSD_8PR_14S_INOX);
+        if (/\b(dishwasher\s*5|eco\s*black|30\s*000|30200)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FFSD_7PR_14S_BK);
+        if (/\b(dishwasher\s*8|neo\s*black|29\s*999|30\s*000)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FFSD_6PR_12S_NEO_BK);
+        if (/\b(dishwasher\s*10|tabletop|ace\s*black|26\s*000|27\s*000|26750)\b/i.test(compareText)) found.push(TATWA_PRODUCT_CATALOG.FFSD_6PR_8S_ACE_BLACK);
+        if (found.length >= 2) {
+          toCompare = found;
+        }
+      }
+
+      // Check for ordinal / relative selections ("first two", "पहले दो", "पहला और दूसरा", "dono ko", "these two", "those two")
+      if (toCompare.length < 2) {
+        let catPool = [];
+        if (category === 'tv' || compareText.includes('tv') || compareText.includes('टीवी')) {
+          catPool = [TATWA_PRODUCT_CATALOG.TV_55_QLED, TATWA_PRODUCT_CATALOG.TV_65_OLED, TATWA_PRODUCT_CATALOG.TV_43_UHD];
+        } else if (category === 'washing_machine' || compareText.includes('wash') || compareText.includes('मशीन')) {
+          catPool = [TATWA_PRODUCT_CATALOG.WM_FL8_INV, TATWA_PRODUCT_CATALOG.WM_TL75_SMT, TATWA_PRODUCT_CATALOG.WM_WD10_AI];
+        } else if (category === 'chimney' || compareText.includes('chimney') || compareText.includes('चिमनी')) {
+          catPool = [TATWA_PRODUCT_CATALOG.AERO_60, TATWA_PRODUCT_CATALOG.AERO_75, TATWA_PRODUCT_CATALOG.AERO_90];
+        } else if (category === 'dishwasher' || compareText.includes('dishwasher') || compareText.includes('डिशवॉशर')) {
+          catPool = [TATWA_PRODUCT_CATALOG.FBID_8PR_14S, TATWA_PRODUCT_CATALOG.FSID_8PR_14S, TATWA_PRODUCT_CATALOG.FFSD_7PR_14S_BK];
+        }
+
+        if (catPool.length >= 2) {
+          if (/(first\s*two|first\s*2|pehle\s*do|पहले\s*दो|पहला\s*और\s*दूसरा|1st\s*and\s*2nd)/i.test(compareText)) {
+            toCompare = [catPool[0], catPool[1]];
+          } else if (/(last\s*two|aakhri\s*do|आखिरी\s*दो|दूसरा\s*और\s*तीसरा|2nd\s*and\s*3rd)/i.test(compareText)) {
+            toCompare = [catPool[1], catPool[2]];
+          } else if (/(dono\s*ko|दोनों\s*को|those\s*two|these\s*two|in\s*dono|दोनों\s*में|dono\s*mein|दोनों)/i.test(compareText)) {
+            toCompare = [catPool[0], catPool[1]];
+          }
         }
       }
     }

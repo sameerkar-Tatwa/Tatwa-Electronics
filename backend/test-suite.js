@@ -474,13 +474,47 @@ const tests = [
         res.body.serviceData.city === 'Bangalore' &&
         Array.isArray(res.body.serviceData.inclusions);
     }
+  },
+  {
+    id: 'TC-27',
+    name: 'Natural Language Price-Based TV Comparison (99,000 vs 36,000)',
+    description: 'Extracts exact 65" OLED (₹99,990) and 55" QLED (₹36,990) from Hindi price phrasing',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "मेरे को तुम 99,000 वाला जो टीवी है, और उसको 36,000 वाले टीवी से कंपेयर करके बताओ", action: "compare" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 2 &&
+        res.body.displayedProducts.some(p => p.sku === 'TE-TV-651-OLED') &&
+        res.body.displayedProducts.some(p => p.sku === 'TE-TV-551-QLED');
+    }
+  },
+  {
+    id: 'TC-28',
+    name: 'Ordinal / Relative Comparison Selection ("पहला और दूसरा")',
+    description: 'Resolves relative selection to the first two category models',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "पहला और दूसरा टीवी कंपेयर करो", action: "compare", category: "tv" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'comparison' &&
+        res.body.displayedProducts.length === 2 &&
+        res.body.displayedProducts[0].sku === 'TE-TV-551-QLED' &&
+        res.body.displayedProducts[1].sku === 'TE-TV-651-OLED';
+    }
   }
 ];
 
 // Runner
 async function runTestSuite() {
   console.log('===============================================================');
-  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (26 TEST CASES)`);
+  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (28 TEST CASES)`);
   console.log(`Target: ${BASE_URL}`);
   console.log('===============================================================\n');
 
