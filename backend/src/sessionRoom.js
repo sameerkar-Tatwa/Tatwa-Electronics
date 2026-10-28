@@ -46,11 +46,11 @@ export class SessionRoom extends DurableObject {
       const encoder = new TextEncoder();
       writer.write(encoder.encode(': keepalive\n\n'));
 
-      // If a product payload was previously displayed, replay it immediately upon connection
+      // If a product payload was previously displayed, replay it marked as isReplay so reloads ignore it
       this.ctx.storage.get('lastPayload').then((lastPayload) => {
         if (lastPayload) {
           try {
-            writer.write(encoder.encode(`data: ${JSON.stringify(lastPayload)}\n\n`));
+            writer.write(encoder.encode(`data: ${JSON.stringify({ ...lastPayload, isReplay: true })}\n\n`));
           } catch (e) {
             console.warn('[SessionRoom] Failed to send cached payload to SSE client', e);
           }
@@ -191,7 +191,7 @@ export class SessionRoom extends DurableObject {
       return new Response(
         JSON.stringify({
           status: 'success',
-          payload: lastPayload || null
+          payload: lastPayload ? { ...lastPayload, isReplay: true } : null
         }),
         {
           status: 200,

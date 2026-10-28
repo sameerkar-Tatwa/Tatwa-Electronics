@@ -212,10 +212,10 @@ app.get(['/api/stream/:sessionId', '/api/stream'], (req, res) => {
   res.write(': keepalive\n\n');
   room.sseClients.add(res);
 
-  // Replay last cached payload
+  // Replay last cached payload (flagged as isReplay: true so clients on reload ignore past state)
   if (room.lastPayload) {
     try {
-      res.write(`data: ${JSON.stringify(room.lastPayload)}\n\n`);
+      res.write(`data: ${JSON.stringify({ ...room.lastPayload, isReplay: true })}\n\n`);
     } catch (_) {}
   }
 
@@ -240,7 +240,7 @@ app.get('/api/last-state', (req, res) => {
   const room = getSessionRoom(sessionId);
   res.json({
     status: 'success',
-    payload: room.lastPayload || null
+    payload: room.lastPayload ? { ...room.lastPayload, isReplay: true } : null
   });
 });
 
@@ -267,6 +267,11 @@ app.all(['/api/tool', '/tool', '/api/oration/product-tool', '/api/product-tool']
       serviceData: resolved.serviceData,
       guideData: resolved.guideData,
       manualData: resolved.manualData,
+      familyTiers: resolved.familyTiers,
+      placeSettingTiers: resolved.placeSettingTiers,
+      suctionSpecs: resolved.suctionSpecs,
+      imageUrl: resolved.imageUrl,
+      videoUrl: resolved.videoUrl,
       brand: 'Tatwa Electronics',
       sessionId: sessionId,
       broadcastDelivered: true,

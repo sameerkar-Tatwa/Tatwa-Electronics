@@ -609,6 +609,21 @@
   // 5. Dynamic Component Viewport Renderer
   function handleIncomingImages(payload) {
     if (!payload) return;
+
+    // Discard replayed or stale payloads generated before this page load/reload
+    // Guarantees that upon reload, the Home screen appears on the right visual, not the last made visual
+    if (payload.isReplay) {
+      console.log('[Visualizer] Ignored replayed payload on page reload:', payload.title || payload.componentType);
+      return;
+    }
+    if (payload.timestamp) {
+      const payloadTime = new Date(payload.timestamp).getTime();
+      if (!isNaN(payloadTime) && payloadTime < pageStartTime - 200) {
+        console.log('[Visualizer] Ignored stale payload from before page reload:', payload.title || payload.componentType);
+        return;
+      }
+    }
+
     console.log('[Visualizer] Incoming event received:', payload.title || payload.componentType, payload);
 
     // Deduplicate identical payloads if unchanged
@@ -648,6 +663,30 @@
     if (compType === 'serviceability' || compType === 'pincode' || payload.action === 'check_pincode' || payload.action === 'serviceability') {
       updateDisplayBadge('Pincode & Installation');
       renderServiceabilityScreen(container, payload.serviceData);
+      return;
+    }
+
+    if (
+      compType === 'wm-family-guide' ||
+      compType === 'washing-machine-family-guide' ||
+      payload.action === 'wm_family_guide' ||
+      payload.action === 'washing_machine_family_guide' ||
+      (payload.title && payload.title.toLowerCase().includes('family & capacity'))
+    ) {
+      updateDisplayBadge('Family & Capacity Guide');
+      renderWMFamilyGuide(container, payload);
+      return;
+    }
+
+    if (
+      compType === 'dishwasher-place-settings-guide' ||
+      compType === 'place-settings-guide' ||
+      payload.action === 'dishwasher_place_settings' ||
+      payload.action === 'place_settings_guide' ||
+      (payload.title && payload.title.toLowerCase().includes('place settings'))
+    ) {
+      updateDisplayBadge('Place Settings Guide');
+      renderDishwasherPlaceSettingsGuide(container, payload);
       return;
     }
 
@@ -721,10 +760,12 @@
       compType === 'bldc-motor' ||
       compType === 'bldc_motor' ||
       payload.action === 'bldc_motor' ||
-      (payload.title && payload.title.toLowerCase().includes('bldc motor'))
+      payload.action === 'suction_capacity' ||
+      payload.action === 'suction' ||
+      (payload.title && (payload.title.toLowerCase().includes('bldc motor') || payload.title.toLowerCase().includes('suction')))
     ) {
-      updateDisplayBadge('Inverter BLDC Motor');
-      renderBLDCMotor(container);
+      updateDisplayBadge('1500 m³/hr Suction & BLDC Motor');
+      renderBLDCMotor(container, payload);
     } else if (
       compType === 'chimney-controls' ||
       compType === 'chimney_controls' ||
@@ -771,7 +812,7 @@
       activeWebSocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data && (data.type === 'PRODUCT_UPDATE' || data.products || data.componentType)) {
+          if (data && !data.isReplay && (data.type === 'PRODUCT_UPDATE' || data.products || data.componentType)) {
             handleIncomingImages(data);
           }
         } catch (_) {}
@@ -802,7 +843,9 @@
       activeEventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          handleIncomingImages(data);
+          if (data && !data.isReplay) {
+            handleIncomingImages(data);
+          }
         } catch (_) {}
       };
 
@@ -822,7 +865,7 @@
         const res = await fetch(stateUrl);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.payload) {
+          if (data && data.payload && !data.payload.isReplay) {
             handleIncomingImages(data.payload);
           }
         }
@@ -1737,7 +1780,7 @@
         </div>
 
         <div class="product-stepper-viewport" id="product-stepper-viewport">
-          <div class="product-stepper-track" id="product-stepper-track" style="transform: translateY(0%);">
+          <div class="product-stepper-track" id="product-stepper-track" style="transform: translateY(0%); transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1);">
             ${pairs.map((pair, pIdx) => `
               <div class="product-stepper-slide ${pair.length === 1 ? 'single-card-slide' : ''}" data-pair="${pIdx}">
                 ${pair.map((item, i) => renderCard(item, pIdx * 2 + i)).join('')}
@@ -1802,13 +1845,13 @@
       });
     });
 
-    // Auto-advance bottom-to-top every 3.8 seconds
+    // Auto-advance bottom-to-top every 10 seconds with slow easy-in scroll
     let autoAdvanceTimer = null;
     function startAutoAdvance() {
       if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
       autoAdvanceTimer = setInterval(() => {
         goToSlide(currentSlide + 1);
-      }, 3800);
+      }, 10000);
     }
 
     function stopAutoAdvance() {
@@ -4081,64 +4124,317 @@
   // ==========================================================================
   // COMPONENT: INVERTER BLDC MOTOR - FULL-VIEW CINEMATIC LOOPING VIDEO
   // ==========================================================================
-  function renderBLDCMotor(container) {
+  // ==========================================================================
+  // COMPONENT: INVERTER BLDC MOTOR - PURE CINEMATIC LOOPING VIDEO (NO CLUTTER)
+  // ==========================================================================
+  function renderBLDCMotor(container, payload) {
     if (!container) return;
+    prepareViewTransition(container);
 
     if (displaySubtitle) {
-      displaySubtitle.textContent = 'Inverter BLDC Motor Architecture & Performance Video';
+      displaySubtitle.textContent = '1500 m³/hr High-Velocity Suction • 150W Inverter BLDC Motor';
     }
 
     container.innerHTML = `
-      <div class="bldc-video-stage" id="bldc-motor-comp">
-        <div class="bldc-video-frame">
-          <video
-            id="bldc-loop-video"
-            class="bldc-cinematic-video"
-            src="images/bldc_motor.mp4"
-            autoplay
-            loop
-            muted
-            playsinline
-          ></video>
-
-          <!-- Bottom Right Corner Tatwa Logo Overlay -->
-          <div class="bldc-video-corner-logo-box" title="Tatwa - Franke Expert">
-            <img
-              src="images/tatwa_logo.svg"
-              alt="Tatwa Electronics"
-              class="bldc-corner-tatwa-logo"
-              onerror="this.src='images/tatwa_logo_white.svg'"
-            />
-          </div>
-
-          <!-- Mute / Unmute Audio Toggle -->
-          <button class="bldc-video-audio-btn" id="btn-toggle-bldc-audio" title="Mute / Unmute Audio" aria-label="Toggle Audio">
-            <span class="audio-btn-icon">🔇</span>
-            <span>Audio</span>
-          </button>
-        </div>
+      <div class="bldc-pure-stage" id="bldc-motor-comp">
+        <video
+          id="bldc-loop-video"
+          class="bldc-pure-video"
+          src="images/bldc_motor.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          controls
+        ></video>
       </div>
     `;
 
-    // Ensure video automatically plays and loops without user gesture blocks
     const videoEl = container.querySelector('#bldc-loop-video');
-    const audioBtn = container.querySelector('#btn-toggle-bldc-audio');
-
     if (videoEl) {
       videoEl.play().catch(() => {
         videoEl.muted = true;
         videoEl.play().catch((e) => console.warn('[BLDC Video Playback]', e));
       });
-
-      if (audioBtn) {
-        audioBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          videoEl.muted = !videoEl.muted;
-          const icon = audioBtn.querySelector('.audio-btn-icon');
-          if (icon) icon.textContent = videoEl.muted ? '🔇' : '🔊';
-        });
-      }
     }
+  }
+
+  // ==========================================================================
+  // COMPONENT: WASHING MACHINE FAMILY SIZE & CAPACITY GUIDE (RESPONSIVE 4-TIER)
+  // ==========================================================================
+  function renderWMFamilyGuide(container, payload) {
+    if (!container) return;
+    prepareViewTransition(container);
+
+    const tiers = (payload && payload.familyTiers) || [
+      {
+        household: '2–3 Members (Couples & Bachelors)',
+        badge: 'Budget-Friendly Entry',
+        capacity: '6.5 kg Wash / 5.0 kg Spin',
+        modelName: 'Tatwa AquaSpin 6.5 kg Semi-Automatic Twin Tub',
+        price: 9990,
+        mrp: 14490,
+        discountPercent: 31,
+        motor: 'High Torque Dual Motor (1350 RPM)',
+        bestFor: 'Budget homes, low water pressure, 15-min quick washes',
+        loadExample: '8–10 daily clothes or 1 single bedsheet',
+        imageUrl: 'images/wm_semi_automatic_65kg.jpg'
+      },
+      {
+        household: '3–4 Members (Standard Family)',
+        badge: 'Most Popular Top Load',
+        capacity: '7.5 kg Smart Load',
+        modelName: 'Tatwa HydroPulse 7.5 kg Top Load Smart Washer',
+        price: 17990,
+        mrp: 25490,
+        discountPercent: 29,
+        motor: 'Smart Pulsator Motor (780 RPM)',
+        bestFor: 'Ergonomic upright loading (no bending), daily cottons & jeans',
+        loadExample: '14–16 daily garments + 1 double bedsheet',
+        imageUrl: 'images/wm_top_load_75kg.jpg'
+      },
+      {
+        household: '4–5 Members (Heavy Laundry)',
+        badge: '5-Star Inverter Care',
+        capacity: '8.0 kg Direct Drive',
+        modelName: 'Tatwa EcoWash Pro 8 kg Front Load Inverter',
+        price: 27490,
+        mrp: 38990,
+        discountPercent: 30,
+        motor: 'Direct Motion Inverter (1400 RPM)',
+        bestFor: 'Heavy family loads, 90°C Steam sanitization & delicates',
+        loadExample: '18–22 garments + king duvet & bath towels',
+        imageUrl: 'images/wm_front_load_8kg.jpg'
+      },
+      {
+        household: '5–8+ Members (Joint Family)',
+        badge: 'Wash & Dry Combo',
+        capacity: '10 kg Wash / 7 kg Dry',
+        modelName: 'Tatwa AeroCare 10 kg AI Washer-Dryer Combo',
+        price: 44990,
+        mrp: 62990,
+        discountPercent: 29,
+        motor: 'AI Direct Drive Motor (1400 RPM)',
+        bestFor: 'Joint families, zero balcony drying, heavy quilts & monsoon',
+        loadExample: '25+ garments, heavy blankets, 100% heat dry',
+        imageUrl: 'images/wm_washer_dryer_10kg.jpg'
+      }
+    ];
+
+    container.innerHTML = `
+      <div class="wm-family-guide-comp" id="wm-family-guide-comp">
+        <header class="guide-header-compact">
+          <div class="guide-header-left">
+            <button class="btn-back-home-pill" id="btn-back-wm-family" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
+            </div>
+            <h1 class="guide-compact-title">WASHING MACHINE CAPACITY &amp; FAMILY GUIDE</h1>
+          </div>
+          <div class="guide-badge-pill">
+            <span>👨‍👩‍👧‍👦 4 Household Tiers</span>
+          </div>
+        </header>
+
+        <!-- Compact Visual Rule Strip -->
+        <div class="guide-quick-bar">
+          <span class="quick-bar-icon">💡</span>
+          <span class="quick-bar-text"><strong>Smart Sizing Rule:</strong> 2–3 Members = <strong>6.5 kg</strong> • 3–4 Members = <strong>7.5 kg Top Load</strong> • 4–5 Members = <strong>8.0 kg Inverter</strong> • Large Joint Family = <strong>10 kg Washer-Dryer</strong></span>
+        </div>
+
+        <!-- 4 Family Tiers Grid: fits 100% in 4 columns -->
+        <div class="family-tiers-grid">
+          ${tiers.map((tier, idx) => `
+            <div class="family-tier-card ${idx === 2 ? 'featured-tier' : ''}">
+              <div class="tier-card-header">
+                <span class="tier-kicker">${tier.badge}</span>
+                <h3 class="tier-household">${tier.household.split('(')[0].trim()}</h3>
+                <div class="tier-capacity-pill">${tier.capacity}</div>
+              </div>
+
+              <div class="tier-img-box">
+                <img src="${tier.imageUrl}" alt="${tier.modelName}" />
+              </div>
+
+              <div class="tier-card-body">
+                <h4 class="tier-model-name">${tier.modelName}</h4>
+                <div class="tier-pricing">
+                  <span class="tier-price">₹${Number(tier.price).toLocaleString('en-IN')}</span>
+                  <span class="tier-mrp">₹${Number(tier.mrp).toLocaleString('en-IN')}</span>
+                  <span class="tier-discount">${tier.discountPercent}% OFF</span>
+                </div>
+
+                <div class="tier-specs-compact">
+                  <div class="tier-chip" title="Load Capacity">🧺 ${tier.loadExample}</div>
+                  <div class="tier-chip" title="Motor Specs">⚡ ${tier.motor}</div>
+                  <div class="tier-chip-highlight" title="Best Use Case">💡 ${tier.bestFor}</div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    const btnBack = container.querySelector('#btn-back-wm-family');
+    if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
+  }
+
+  // ==========================================================================
+  // COMPONENT: DISHWASHER PLACE SETTINGS & CAPACITY GUIDE (VISUAL RACK TIERS)
+  // ==========================================================================
+  function renderDishwasherPlaceSettingsGuide(container, payload) {
+    if (!container) return;
+    prepareViewTransition(container);
+
+    const tiers = (payload && payload.placeSettingTiers) || [
+      {
+        tierName: '8 Place Settings',
+        badge: 'Compact Tabletop',
+        type: 'Ace Series Tabletop',
+        household: '1 to 3 Members (Bachelors / Couples)',
+        utensilCount: '64–72 Utensils / Cycle',
+        placement: 'Kitchen Countertop / Tabletop (Zero installation)',
+        fitsUtensils: '8 Dinner Thalis, Bowls, Glasses & Small Pots',
+        priceRange: '₹26,750 – ₹28,150',
+        imageUrl: 'images/dw_rack_8_place.jpg',
+        keyHighlights: [
+          'Zero cabinetry modification — sits beside kitchen sink',
+          'Accommodates 8 dinner plates, katoris, glasses & cutlery',
+          'Half Load cycle saves up to 50% water & power for 1-2 people',
+          '70°C Intensive Hygiene wash kills 99.9% kitchen bacteria'
+        ]
+      },
+      {
+        tierName: '12 Place Settings',
+        badge: 'Nuclear Family (Best Value)',
+        type: 'Neo Series Freestanding',
+        household: '4 to 5 Members (Standard Nuclear Household)',
+        utensilCount: '96–108 Utensils / Cycle',
+        placement: 'Floor-standing (Fits under slab or beside sink)',
+        fitsUtensils: '12 Thalis, Kadai, Fry Pan, Glasses & Bowls',
+        priceRange: '₹29,999 – ₹34,250',
+        imageUrl: 'images/dw_rack_12_place.jpg',
+        keyHighlights: [
+          'Best value Indian dishwasher under ₹30,000 (Neo ₹29,999)',
+          'Accommodates breakfast, lunch & dinner in 1 single night wash',
+          'Lower rack fits Indian cooking kadai, frying pans & saucepans',
+          'Power Memory automatically resumes wash after power cuts'
+        ]
+      },
+      {
+        tierName: '14 Place Settings',
+        badge: 'Heavy Cookware & Kadai',
+        type: 'PureWash Integrated / Freestanding',
+        household: '5 to 8+ Members (Joint Families & Entertaining)',
+        utensilCount: '112–130+ Utensils / Cycle',
+        placement: 'Built-in / Semi-Integrated / Freestanding',
+        fitsUtensils: '5L Pressure Cooker, Deep Kadai, Patila & 14 Thalis',
+        priceRange: '₹30,200 – ₹63,901',
+        imageUrl: 'images/dw_rack_14_place.jpg',
+        keyHighlights: [
+          '3 Full-size Pull-Out Racks + dedicated top cutlery sliding tray',
+          'Foldable bottom tines fit heavy 5L pressure cookers & oily kadai',
+          '3D Triple Spray Arms reach inside deep pressure cookers & pots',
+          'Dual Zone wash lets you run upper or lower rack independently'
+        ]
+      }
+    ];
+
+    container.innerHTML = `
+      <div class="dw-place-settings-comp" id="dw-place-settings-comp">
+        <header class="guide-header-compact">
+          <div class="guide-header-left">
+            <button class="btn-back-home-pill" id="btn-back-dw-places" title="Return to All Categories Home">
+              <span>← All Categories</span>
+            </button>
+            <div class="brand-wordmark">
+              <span class="brand-wordmark-text">TATWA</span>
+              <span class="brand-accent-line"></span>
+            </div>
+            <h1 class="guide-compact-title">DISHWASHER PLACE SETTINGS &amp; CAPACITY GUIDE</h1>
+          </div>
+          <div class="guide-badge-pill">
+            <span>🍽️ 8 Place vs 12 Place vs 14 Place</span>
+          </div>
+        </header>
+
+        <!-- Compact Visual Definition Strip -->
+        <div class="guide-quick-bar dw-quick-bar">
+          <span class="quick-bar-icon">🍽️</span>
+          <span class="quick-bar-text"><strong>What is 1 Indian Place Setting?</strong> 1 Dinner Thali + 1 Quarter Plate + 1 Glass + 2 Katoris/Bowls + Cutlery. Higher place settings (12S &amp; 14S) feature foldable bottom tines engineered specifically for heavy Indian Kadai &amp; 5L Pressure Cookers.</span>
+        </div>
+
+        <!-- 3 Place Setting Tiers Grid (Card with rack image, metrics and concise points) -->
+        <div class="place-settings-grid">
+          ${tiers.map((tier, idx) => `
+            <div class="place-tier-card ${idx === 2 ? 'featured-tier' : ''}">
+              <div class="tier-card-header">
+                <span class="tier-kicker">${tier.badge}</span>
+                <h3 class="tier-title">${tier.tierName}</h3>
+                <div class="tier-series-sub">${tier.type || ''}</div>
+              </div>
+
+              <!-- Dedicated Visual Image of Dishwasher Rack Loaded -->
+              <div class="place-rack-img-box" title="${tier.tierName} Rack Layout">
+                <img src="${tier.imageUrl}" alt="${tier.tierName} Rack Interior" class="place-rack-img" />
+                <span class="rack-capacity-tag">${tier.utensilCount}</span>
+              </div>
+
+              <div class="place-tier-body">
+                <!-- Visual Metric Pills (Clean icons, zero bulky paragraphs) -->
+                <div class="place-metrics-grid">
+                  <div class="place-metric-pill" title="Household Recommendation">
+                    <span class="m-icon">👥</span>
+                    <div class="m-content">
+                      <span class="m-label">Family Size</span>
+                      <strong class="m-val">${tier.household}</strong>
+                    </div>
+                  </div>
+
+                  <div class="place-metric-pill" title="Cookware Supported">
+                    <span class="m-icon">🥘</span>
+                    <div class="m-content">
+                      <span class="m-label">Cookware</span>
+                      <strong class="m-val">${tier.fitsUtensils}</strong>
+                    </div>
+                  </div>
+
+                  <div class="place-metric-pill" title="Installation Type">
+                    <span class="m-icon">📐</span>
+                    <div class="m-content">
+                      <span class="m-label">Placement</span>
+                      <strong class="m-val">${tier.placement}</strong>
+                    </div>
+                  </div>
+
+                  <div class="place-metric-pill price-pill" title="Price Range Across Models">
+                    <span class="m-icon">🏷️</span>
+                    <div class="m-content">
+                      <span class="m-label">Price Range</span>
+                      <strong class="m-val-price">${tier.priceRange}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Concise Advantages -->
+                <div class="tier-highlights-compact">
+                  <ul class="highlights-list-compact">
+                    ${(tier.keyHighlights || []).map(h => `<li><span class="check-icon">✓</span> <span>${h}</span></li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    const btnBack = container.querySelector('#btn-back-dw-places');
+    if (btnBack) btnBack.addEventListener('click', () => renderTatwaWelcomeScreen(container));
   }
 
   // ==========================================================================
@@ -4607,23 +4903,13 @@
     });
   });
 
-  // 9. Preload all 13 products on startup
+  // 9. Preload products on startup without overwriting the Home Screen
   async function loadInitialImages() {
     try {
       const targetUrl = `${backendUrl}/api/products`;
-      const res = await fetch(targetUrl);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.products && data.products.length > 0) {
-          handleIncomingImages({
-            componentType: 'products',
-            title: 'Tatwa Electronics Collection (20 Models)',
-            subtitle: 'All 20 verified Tatwa smart appliances loaded across 4 categories. Ask the agent or select a trigger.',
-            products: data.products
-          });
-          updateDisplayBadge(`All Products (${data.products.length})`);
-        }
-      }
+      await fetch(targetUrl);
+      // Ensure the Category Home Screen is displayed
+      renderTatwaWelcomeScreen();
     } catch (e) {
       console.warn('Initial load error:', e);
     }

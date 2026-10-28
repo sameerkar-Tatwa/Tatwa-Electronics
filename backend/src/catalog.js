@@ -1285,6 +1285,60 @@ export function resolveToolRequest(rawInput = {}) {
   ) {
     action = 'serviceability';
   } else if (
+    action === 'bldc_motor' ||
+    action === 'suction_capacity' ||
+    action === 'suction' ||
+    action === 'chimney_motor' ||
+    lowerText.includes('suction capacity') ||
+    lowerText.includes('suction') ||
+    lowerText.includes('1500') ||
+    lowerText.includes('cubic meter') ||
+    lowerText.includes('fumes') ||
+    lowerText.includes('heavy smoke') ||
+    lowerText.includes('bldc') ||
+    lowerText.includes('inverter motor') ||
+    (lowerText.includes('motor') && (category === 'chimney' || lowerText.includes('chimney') || lowerText.includes('चिमनी'))) ||
+    (lowerText.includes('क्षमता') && lowerText.includes('मोटर') && (category === 'chimney' || lowerText.includes('चिमनी')))
+  ) {
+    action = 'bldc_motor';
+  } else if (
+    action === 'wm_family_guide' ||
+    action === 'washing_machine_family_guide' ||
+    action === 'wm_capacity_guide' ||
+    action === 'family_guide' ||
+    lowerText.includes('which family') ||
+    lowerText.includes('family size') ||
+    lowerText.includes('suitable for which family') ||
+    lowerText.includes('better for which kind of family') ||
+    lowerText.includes('kis family') ||
+    lowerText.includes('parivar') ||
+    lowerText.includes('members') ||
+    (lowerText.includes('family') && (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('मशीन'))) ||
+    (lowerText.includes('सदस्यों') && lowerText.includes('परिवार')) ||
+    (lowerText.includes('क्षमता और मोटर') && (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('मशीन') || lowerText.includes('किलोग्राम') || lowerText.includes('kilograms'))) ||
+    (lowerText.includes('capacity') && lowerText.includes('motor') && (category === 'washing_machine' || lowerText.includes('wash')))
+  ) {
+    action = 'wm_family_guide';
+  } else if (
+    action === 'dishwasher_place_settings' ||
+    action === 'place_settings_guide' ||
+    action === 'dw_capacity_guide' ||
+    lowerText.includes('place setting') ||
+    lowerText.includes('place settings') ||
+    lowerText.includes('plate setting') ||
+    lowerText.includes('plate settings') ||
+    lowerText.includes('different type of plate setting') ||
+    lowerText.includes('difference between different type of plate setting') ||
+    lowerText.includes('difference between place settings') ||
+    lowerText.includes('8 place vs 12 place') ||
+    lowerText.includes('12 place vs 14 place') ||
+    lowerText.includes('8s vs 12s vs 14s') ||
+    lowerText.includes('8s vs 12s') ||
+    lowerText.includes('place settings difference') ||
+    (lowerText.includes('difference') && (lowerText.includes('place') || lowerText.includes('plate')) && (category === 'dishwasher' || lowerText.includes('dishwasher') || lowerText.includes('डिशवॉशर')))
+  ) {
+    action = 'dishwasher_place_settings';
+  } else if (
     /\b(compare|comparison|comparing|versus|vs|diff|difference)\b/i.test(lowerText) ||
     lowerText.includes('कंपेयर') ||
     lowerText.includes('तुलना') ||
@@ -1521,20 +1575,42 @@ export function resolveToolRequest(rawInput = {}) {
     };
   }
 
-  // 1f. BLDC Inverter Motor Spotlight
-  if (action === 'bldc_motor' || lowerText.includes('bldc') || lowerText.includes('inverter motor')) {
+  // 1f. BLDC Inverter Motor & 1500 m³/hr Suction Spotlight
+  if (
+    action === 'bldc_motor' ||
+    action === 'suction_capacity' ||
+    action === 'suction' ||
+    action === 'chimney_motor' ||
+    lowerText.includes('bldc') ||
+    lowerText.includes('inverter motor') ||
+    lowerText.includes('suction capacity') ||
+    lowerText.includes('suction') ||
+    lowerText.includes('1500') ||
+    lowerText.includes('cubic meter') ||
+    lowerText.includes('fumes') ||
+    lowerText.includes('heavy smoke') ||
+    (lowerText.includes('motor') && (category === 'chimney' || lowerText.includes('chimney') || lowerText.includes('चिमनी'))) ||
+    (lowerText.includes('क्षमता') && lowerText.includes('मोटर') && (category === 'chimney' || lowerText.includes('चिमनी')))
+  ) {
     return {
       componentType: 'bldc-motor',
-      title: 'Tatwa Inverter BLDC Motor Technology',
-      subtitle: 'Brushless DC Inverter Motor Architecture & Operation Video',
+      title: 'Tatwa 1500 m³/hr Suction & Inverter BLDC Motor',
+      subtitle: '1500 m³/hr High-Velocity Suction • 150W Inverter BLDC Motor • 12-Year Warranty',
       videoUrl: 'images/bldc_motor.mp4',
+      suctionSpecs: {
+        capacity: '1500 m³/hr High-Velocity Airflow',
+        motorType: '150W Brushless DC (BLDC) Inverter Motor',
+        noiseLevel: 'Whisper-Quiet 44–46 dB',
+        warranty: '12 Years Motor Warranty + 2 Years Comprehensive',
+        coverage: 'Heavy Indian Tadka, Deep Frying, and 3–5 Burner Stoves'
+      },
       products: [TATWA_PRODUCT_CATALOG.AERO_60, TATWA_PRODUCT_CATALOG.AERO_75, TATWA_PRODUCT_CATALOG.AERO_90],
       images: [
         {
-          name: 'Inverter BLDC Motor Video',
-          title: 'Brushless DC Inverter Motor Architecture',
+          name: '1500 m3/hr Suction & BLDC Motor Video',
+          title: '1500 m³/hr High Airflow & Brushless DC Motor',
           imageUrl: 'images/bldc_motor.mp4',
-          description: 'Consumes only 150W, runs whisper-quiet at 44-46 dB, and backed by an industry-leading 12-year warranty.'
+          description: '1500 m³/hr suction purges dense cooking fumes in seconds, consumes only 150W, and runs whisper-quiet with 12-year motor warranty.'
         }
       ]
     };
@@ -1620,6 +1696,218 @@ export function resolveToolRequest(rawInput = {}) {
           title: '9-Min Heating + 1-Min Fan Oil Collector Guide',
           imageUrl: TATWA_PRODUCT_CATALOG.AERO_60.imageUrl,
           description: 'Thermal heat auto-clean separates oil into the stainless steel collector.'
+        }
+      ]
+    };
+  }
+
+  // 1k. Washing Machine Family Size & Capacity Guide
+  if (
+    action === 'wm_family_guide' ||
+    action === 'washing_machine_family_guide' ||
+    action === 'wm_capacity_guide' ||
+    action === 'family_guide' ||
+    lowerText.includes('which family') ||
+    lowerText.includes('family size') ||
+    lowerText.includes('suitable for which family') ||
+    lowerText.includes('better for which kind of family') ||
+    lowerText.includes('kis family') ||
+    lowerText.includes('parivar') ||
+    lowerText.includes('members') ||
+    (lowerText.includes('family') && (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('मशीन'))) ||
+    (lowerText.includes('सदस्यों') && lowerText.includes('परिवार')) ||
+    (lowerText.includes('क्षमता और मोटर') && (category === 'washing_machine' || lowerText.includes('wash') || lowerText.includes('मशीन') || lowerText.includes('किलोग्राम') || lowerText.includes('kilograms'))) ||
+    (lowerText.includes('capacity') && lowerText.includes('motor') && (category === 'washing_machine' || lowerText.includes('wash')))
+  ) {
+    return {
+      componentType: 'wm-family-guide',
+      title: 'Tatwa Washing Machines Family & Capacity Guide',
+      subtitle: 'Matching Drum Capacity, Motor Specs & Household Size (2–3, 3–4, 4–5 & 5+ Members)',
+      imageUrl: 'images/wm_family_guide_hero.jpg',
+      familyTiers: [
+        {
+          household: '2–3 Members (Couples & Bachelors)',
+          badge: 'Budget-Friendly Entry',
+          capacity: '6.5 kg Wash / 5.0 kg Spin',
+          modelName: 'Tatwa AquaSpin 6.5 kg Semi-Automatic Twin Tub',
+          sku: 'TE-WM-SA651-TT',
+          enumKey: 'WM_SA65_TT',
+          price: 9990,
+          mrp: 14490,
+          discountPercent: 31,
+          motor: 'High Torque Dual Wash & Spin Motor (1350 RPM)',
+          bestFor: 'Budget-conscious homes, low water pressure areas, quick 15-min washes',
+          loadExample: '8–10 daily clothes or 1 single bedsheet + pillowcases',
+          imageUrl: 'images/wm_semi_automatic_65kg.jpg'
+        },
+        {
+          household: '3–4 Members (Standard Nuclear Family)',
+          badge: 'Most Popular Top Load',
+          capacity: '7.5 kg Smart Load',
+          modelName: 'Tatwa HydroPulse 7.5 kg Top Load Smart Washer',
+          sku: 'TE-WM-TL751-SMT',
+          enumKey: 'WM_TL75_SMT',
+          price: 17990,
+          mrp: 25490,
+          discountPercent: 29,
+          motor: 'Smart HydroPulse Pulsator Motor (780 RPM)',
+          bestFor: 'Ergonomic upright loading (no bending), daily cottons, jeans and bed linen',
+          loadExample: '14–16 daily garments + 1 double bedsheet',
+          imageUrl: 'images/wm_top_load_75kg.jpg'
+        },
+        {
+          household: '4–5 Members (Daily Heavy Laundry)',
+          badge: '5-Star Inverter Fabric Care',
+          capacity: '8.0 kg Direct Drive',
+          modelName: 'Tatwa EcoWash Pro 8 kg Front Load Inverter',
+          sku: 'TE-WM-FL81-INV',
+          enumKey: 'WM_FL8_INV',
+          price: 27490,
+          mrp: 38990,
+          discountPercent: 30,
+          motor: 'Direct Motion Inverter Motor (1400 RPM Steam)',
+          bestFor: 'Heavy daily family loads, baby clothes sanitization, delicate silks, 90°C Steam Allergy Care',
+          loadExample: '18–22 garments + king size duvet & bath towels',
+          imageUrl: 'images/wm_front_load_8kg.jpg'
+        },
+        {
+          household: '5–8+ Members (Large Family / Zero Balcony)',
+          badge: 'Luxury 100% Wash & Dry Combo',
+          capacity: '10 kg Wash / 7 kg 100% Heat Dry',
+          modelName: 'Tatwa AeroCare 10 kg AI Washer-Dryer Combo',
+          sku: 'TE-WM-WD101-AI',
+          enumKey: 'WM_WD10_AI',
+          price: 44990,
+          mrp: 62990,
+          discountPercent: 29,
+          motor: 'AI Inverter Direct Drive Motor (1400 RPM)',
+          bestFor: 'Large joint families, apartments without drying space, monsoon drying, heavy curtains & quilts',
+          loadExample: '25+ garments, heavy winter blankets, complete wash-to-cupboard drying',
+          imageUrl: 'images/wm_washer_dryer_10kg.jpg'
+        }
+      ],
+      products: [
+        TATWA_PRODUCT_CATALOG.WM_SA65_TT,
+        TATWA_PRODUCT_CATALOG.WM_TL75_SMT,
+        TATWA_PRODUCT_CATALOG.WM_FL8_INV,
+        TATWA_PRODUCT_CATALOG.WM_WD10_AI
+      ],
+      images: [
+        {
+          name: 'Washing Machine Family Guide',
+          title: 'Matching Machine Capacity to Household Size',
+          imageUrl: 'images/wm_family_guide_hero.jpg',
+          description: '6.5kg (2–3 members), 7.5kg/8kg (4–5 members), and 10kg AI Washer-Dryer (5–8+ members).'
+        }
+      ]
+    };
+  }
+
+  // 1l. Dishwasher Place Settings & Capacity Difference Guide
+  if (
+    action === 'dishwasher_place_settings' ||
+    action === 'place_settings_guide' ||
+    action === 'dw_capacity_guide' ||
+    lowerText.includes('place setting') ||
+    lowerText.includes('place settings') ||
+    lowerText.includes('plate setting') ||
+    lowerText.includes('plate settings') ||
+    lowerText.includes('different type of plate setting') ||
+    lowerText.includes('difference between different type of plate setting') ||
+    lowerText.includes('difference between place settings') ||
+    lowerText.includes('8 place vs 12 place') ||
+    lowerText.includes('12 place vs 14 place') ||
+    lowerText.includes('8s vs 12s vs 14s') ||
+    lowerText.includes('8s vs 12s') ||
+    lowerText.includes('place settings difference') ||
+    (lowerText.includes('difference') && (lowerText.includes('place') || lowerText.includes('plate')) && (category === 'dishwasher' || lowerText.includes('dishwasher') || lowerText.includes('डिशवॉशर')))
+  ) {
+    return {
+      componentType: 'dishwasher-place-settings-guide',
+      title: 'Tatwa Dishwasher Place Settings & Capacity Guide',
+      subtitle: 'Comparing 8 Place, 12 Place & 14 Place Settings for Indian Kitchens, Cookware & Household Size',
+      imageUrl: 'images/dw_place_settings_hero.jpg',
+      placeSettingTiers: [
+        {
+          tierName: '8 Place Settings (Ace Series Tabletop)',
+          badge: 'Compact Tabletop (1–3 Members)',
+          household: '1 to 3 Members (Bachelors, Couples, Small Kitchens)',
+          utensilCount: '64 to 72 utensils per cycle',
+          placement: 'Kitchen Countertop / Tabletop (Zero cabinetry modification)',
+          dimensions: '595 × 550 × 500 mm (W × D × H)',
+          fitsUtensils: '8 Dinner Plates, 8 Quarter Plates, 8 Glasses, 8 Katoris/Bowls, 24 Cutlery Pieces + 2 Small Cookware Pots',
+          priceRange: '₹26,750 – ₹28,150',
+          models: [
+            { name: 'Tatwa PureWash FFSD 6PR 8S Ace Black', price: 26750, mrp: 30490, sku: 'TE-DW-082-CPT' },
+            { name: 'Tatwa PureWash FFSD 6PR 8S Ace Inox', price: 28150, mrp: 31990, sku: 'TE-DW-081-CPT' }
+          ],
+          keyHighlights: [
+            'Fits comfortably on standard countertop next to sink',
+            'Half Load function saves water and electricity for 1-2 people',
+            '6 intensive wash programs with 70°C hot water hygiene',
+            '5-Year cavity warranty with stainless steel interior'
+          ],
+          imageUrl: 'images/dw_rack_8_place.jpg'
+        },
+        {
+          tierName: '12 Place Settings (Neo Series Freestanding)',
+          badge: 'Nuclear Family (4–5 Members)',
+          household: '4 to 5 Members (Standard Indian Nuclear Household)',
+          utensilCount: '96 to 108 utensils per cycle',
+          placement: 'Freestanding Floor-standing (Fits under kitchen slab or beside sink)',
+          dimensions: '845 × 598 × 600 mm (W × D × H)',
+          fitsUtensils: '12 Dinner Plates, 12 Glasses, 12 Katoris, Spoons + 2 Medium Kadai / Fry Pans / Tea Saucepan',
+          priceRange: '₹29,999 – ₹34,250',
+          models: [
+            { name: 'Tatwa PureWash FFSD 6PR 12S Neo Black', price: 29999, mrp: 37490, sku: 'TE-DW-122-BK' },
+            { name: 'Tatwa PureWash FFSD 6PR 12S Neo Inox', price: 34250, mrp: 40990, sku: 'TE-DW-121-INOX' }
+          ],
+          keyHighlights: [
+            'Best value Indian dishwasher under ₹30,000 (Neo Black ₹29,999)',
+            'Accommodates daily breakfast, lunch & dinner utensils in a single night wash',
+            'Power Memory auto-resumes wash after power cuts',
+            'Height-adjustable upper basket for tall glasses and bowls'
+          ],
+          imageUrl: 'images/dw_rack_12_place.jpg'
+        },
+        {
+          tierName: '14 Place Settings (PureWash Integrated & Freestanding)',
+          badge: 'Heavy Cookware & Joint Family (5–8+ Members)',
+          household: '5 to 8+ Members (Joint Families, Heavy Kadai Cooking, Entertaining)',
+          utensilCount: '112 to 130+ utensils per cycle',
+          placement: 'Built-in Cabinet Concealed, Semi-Integrated, or Freestanding',
+          dimensions: '815 / 845 × 598 × 600 mm (W × D × H)',
+          fitsUtensils: '5L Pressure Cooker, Deep Kadai, Patila, 14 Thalis, 14 Glasses, 14 Katoris + Dedicated 3rd Cutlery Tray',
+          priceRange: '₹30,200 – ₹63,901 (6 Models)',
+          models: [
+            { name: 'Tatwa PureWash FFSD 7PR 14S Eco Black', price: 30200, mrp: 45990, sku: 'TE-DW-145-ECO' },
+            { name: 'Tatwa PureWash FFSD 6PR 14S Black Digital', price: 35010, mrp: 48990, sku: 'TE-DW-146-DIG' },
+            { name: 'Tatwa PureWash FFSD 14S Obsidian Black', price: 51964, mrp: 57990, sku: 'TE-DW-144-BK' },
+            { name: 'Tatwa PureWash FFSD 14S Inox', price: 52170, mrp: 60490, sku: 'TE-DW-143-FS' },
+            { name: 'Tatwa PureWash FSID 14S Semi-Integrated', price: 58617, mrp: 65490, sku: 'TE-DW-142-SEMI' },
+            { name: 'Tatwa PureWash FBID 14S Integrated', price: 63901, mrp: 70990, sku: 'TE-DW-141-INT' }
+          ],
+          keyHighlights: [
+            'Dual Zone Wash (run upper or lower rack independently)',
+            '3D Triple Spray Arms reach inside deep pressure cookers & oily kadai',
+            'A++ energy efficiency with natural drying and 10-year cavity warranty',
+            'Available in Built-in (concealed), Semi-Integrated & Freestanding'
+          ],
+          imageUrl: 'images/dw_rack_14_place.jpg'
+        }
+      ],
+      products: [
+        TATWA_PRODUCT_CATALOG.FFSD_6PR_8S_ACE_INOX,
+        TATWA_PRODUCT_CATALOG.FFSD_6PR_12S_NEO_BK,
+        TATWA_PRODUCT_CATALOG.FFSD_7PR_14S_BK,
+        TATWA_PRODUCT_CATALOG.FBID_8PR_14S
+      ],
+      images: [
+        {
+          name: 'Dishwasher Place Settings Comparison',
+          title: '8S Tabletop vs 12S Freestanding vs 14S Heavy Cookware',
+          imageUrl: 'images/dw_place_settings_hero.jpg',
+          description: 'Compare capacity, dimensions, utensils count, and installation options across 8S, 12S, and 14S place settings.'
         }
       ]
     };

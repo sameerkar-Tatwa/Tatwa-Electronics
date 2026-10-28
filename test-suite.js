@@ -508,13 +508,58 @@ const tests = [
         res.body.displayedProducts[0].sku === 'TE-TV-551-QLED' &&
         res.body.displayedProducts[1].sku === 'TE-TV-651-OLED';
     }
+  },
+  {
+    id: 'TC-29',
+    name: 'Chimney Suction Capacity & Motor (1500 m3/hr)',
+    description: 'When asked about suction capacity and motor, visual must be BLDC motor with 1500 m3/hr suction',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "understand the suction capacity and motor of one thousand five hundred cubic meters per hour", category: "chimney" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'bldc-motor' &&
+        res.body.title.includes('1500 m³/hr Suction');
+    }
+  },
+  {
+    id: 'TC-30',
+    name: 'Washing Machine Family Size Suitability Guide',
+    description: 'When asked which washing machine is better for which kind of family / capacity aur motor',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "which washing machine will be better for which kind of family", category: "washing_machine" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'wm-family-guide' &&
+        res.body.familyTiers.length === 4;
+    }
+  },
+  {
+    id: 'TC-31',
+    name: 'Dishwasher Different Place Settings Difference Guide',
+    description: 'When asked what are the difference of the different place setting / plate setting',
+    request: {
+      method: 'POST',
+      path: '/api/tool',
+      body: { query: "what are the difference of the different place setting", category: "dishwasher" }
+    },
+    validate: (res) => {
+      return res.status === 200 &&
+        res.body.componentType === 'dishwasher-place-settings-guide' &&
+        res.body.placeSettingTiers.length === 3;
+    }
   }
 ];
 
 // Runner
 async function runTestSuite() {
   console.log('===============================================================');
-  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (28 TEST CASES)`);
+  console.log(`⚡ RUNNING TATWA ELECTRONICS TEST SUITE (${tests.length} TEST CASES)`);
   console.log(`Target: ${BASE_URL}`);
   console.log('===============================================================\n');
 
