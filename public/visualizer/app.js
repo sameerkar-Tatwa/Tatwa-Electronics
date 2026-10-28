@@ -1433,169 +1433,65 @@
     startAutoCycle();
   }
 
-  // Component 0: Tatwa Electronics Category Home Screen (Default Right-Pane Landing)
+    // Component 0: Tatwa Electronics Welcome Screen (Minimal, Clean & Simple Luxury Presentation)
   function renderTatwaWelcomeScreen(container) {
     const target = container || document.getElementById('component-viewport') || productGrid;
     if (!target) return;
     prepareViewTransition(target);
 
     updateDisplayBadge('Tatwa Studio');
-    if (displaySubtitle) displaySubtitle.textContent = 'Select an appliance category or speak with the assistant';
+    if (typeof displaySubtitle !== 'undefined' && displaySubtitle) {
+      displaySubtitle.textContent = 'Speak to the assistant or select an appliance to begin';
+    }
 
     target.innerHTML = `
-      <div class="tatwa-home-container">
-        <!-- Home Header Banner -->
-        <div class="tatwa-home-header">
-          <div class="tatwa-home-kicker">
-            <span class="pulse-dot-cyan"></span>
-            <span>TATWA SMART LIVING ECOSYSTEM</span>
-          </div>
-          <h2 class="tatwa-home-title">Intelligent Living. Effortless Voice Control.</h2>
-          <p class="tatwa-home-sub">
-            Explore Tatwa's next-generation smart home appliances. Select a category below or speak to the <strong>Tatwa AI Assistant</strong> on the left in English or Hindi.
-          </p>
-        </div>
-
-        <!-- The 4 Appliance Category Grid -->
-        <div class="tatwa-category-grid">
-          <!-- Category 1: Auto-Clean BLDC Chimneys -->
-          <div class="tatwa-cat-card" data-cat="chimney" role="button" tabindex="0">
-            <div class="tatwa-cat-badge">1500 m³/hr • 12-Yr Motor Warranty</div>
-            <div class="tatwa-cat-img-box">
-              <img src="images/chimney_curved_glass.jpg" alt="Smart BLDC Chimneys" />
-            </div>
-            <div class="tatwa-cat-body">
-              <div class="tatwa-cat-meta">
-                <span class="cat-icon">🌪️</span>
-                <span class="cat-count">3 Verified Models</span>
-              </div>
-              <h3 class="tatwa-cat-name">Auto-Clean BLDC Chimneys</h3>
-              <p class="tatwa-cat-desc">Curved glass hoods with 150W inverter motor, thermal auto-clean & touchless wave gesture control.</p>
-              <div class="tatwa-cat-footer">
-                <div class="tatwa-cat-price">
-                  <span class="cat-from">From</span>
-                  <span class="cat-amt">₹21,330</span>
-                  <span class="cat-discount">34% OFF</span>
-                </div>
-                <button class="tatwa-cat-btn" data-cat="chimney">View 3 Models →</button>
-              </div>
-            </div>
+      <div class="tatwa-welcome-container">
+        <div class="tatwa-welcome-card glass-panel">
+          <div class="welcome-brand-emblem glass-card">
+            <img src="images/tatwa_logo.svg" alt="Tatwa Electronics" class="welcome-tatwa-logo" />
           </div>
 
-          <!-- Category 2: PureWash Dishwashers -->
-          <div class="tatwa-cat-card" data-cat="dishwasher" role="button" tabindex="0">
-            <div class="tatwa-cat-badge">14S / 12S / 8S • 70°C Intensive Wash</div>
-            <div class="tatwa-cat-img-box">
-              <img src="images/dw_usp_hero.jpg" alt="PureWash Dishwashers" />
-            </div>
-            <div class="tatwa-cat-body">
-              <div class="tatwa-cat-meta">
-                <span class="cat-icon">🍽️</span>
-                <span class="cat-count">10 Verified Models</span>
-              </div>
-              <h3 class="tatwa-cat-name">PureWash Dishwashers</h3>
-              <p class="tatwa-cat-desc">Engineered for oily kadhais & Indian cookware with intensive 70°C sanitization & water softener.</p>
-              <div class="tatwa-cat-footer">
-                <div class="tatwa-cat-price">
-                  <span class="cat-from">From</span>
-                  <span class="cat-amt">₹17,990</span>
-                  <span class="cat-discount">36% OFF</span>
-                </div>
-                <button class="tatwa-cat-btn" data-cat="dishwasher">View 10 Models →</button>
-              </div>
-            </div>
+          <div class="welcome-title-wrap">
+            <span class="welcome-kicker">TATWA SMART LIVING • NEXT-GEN ELECTRONICS</span>
+            <h2 class="welcome-headline">Tatwa Smart Appliance Visualizer</h2>
+            <p class="welcome-lead">
+              Official interactive showcase for Tatwa chimneys, dishwashers, washing machines &amp; smart TVs. Speak with the AI assistant on the left to explore appliances, guides &amp; comparisons.
+            </p>
           </div>
 
-          <!-- Category 3: AI Inverter Washing Machines -->
-          <div class="tatwa-cat-card" data-cat="washing_machine" role="button" tabindex="0">
-            <div class="tatwa-cat-badge">Direct Drive • 1400 RPM • Steam Care</div>
-            <div class="tatwa-cat-img-box">
-              <img src="images/wm_front_load_8kg.jpg" alt="AI Inverter Washers" />
-            </div>
-            <div class="tatwa-cat-body">
-              <div class="tatwa-cat-meta">
-                <span class="cat-icon">🌀</span>
-                <span class="cat-count">4 Verified Models</span>
-              </div>
-              <h3 class="tatwa-cat-name">AI Inverter Washers</h3>
-              <p class="tatwa-cat-desc">Direct drive inverter motor, AI fabric sensors, 99.9% allergy steam wash & 5-Star BEE rating.</p>
-              <div class="tatwa-cat-footer">
-                <div class="tatwa-cat-price">
-                  <span class="cat-from">From</span>
-                  <span class="cat-amt">₹9,990</span>
-                  <span class="cat-discount">31% OFF</span>
-                </div>
-                <button class="tatwa-cat-btn" data-cat="washing_machine">View 4 Models →</button>
-              </div>
-            </div>
+          <div class="welcome-action-hint glass-pill">
+            <div class="hint-pulse"></div>
+            <span>Speak to the <strong>Tatwa AI Assistant</strong> on the left, or select a quick topic below:</span>
           </div>
 
-          <!-- Category 4: Cinema Vision 4K Smart TVs -->
-          <div class="tatwa-cat-card" data-cat="tv" role="button" tabindex="0">
-            <div class="tatwa-cat-badge">4K QLED & OLED • 144Hz VRR</div>
-            <div class="tatwa-cat-img-box">
-              <img src="images/tv_qled_55inch.jpg" alt="Cinema Vision 4K TVs" />
-            </div>
-            <div class="tatwa-cat-body">
-              <div class="tatwa-cat-meta">
-                <span class="cat-icon">📺</span>
-                <span class="cat-count">3 Verified Models</span>
-              </div>
-              <h3 class="tatwa-cat-name">Cinema Vision 4K TVs</h3>
-              <p class="tatwa-cat-desc">Quantum Dot QLED & Cinema OLED displays, 144Hz gaming VRR, Dolby Atmos audio & Google TV.</p>
-              <div class="tatwa-cat-footer">
-                <div class="tatwa-cat-price">
-                  <span class="cat-from">From</span>
-                  <span class="cat-amt">₹21,990</span>
-                  <span class="cat-discount">33% OFF</span>
-                </div>
-                <button class="tatwa-cat-btn" data-cat="tv">View 3 Models →</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Voice Actions & Blueprint Triggers -->
-        <div class="tatwa-home-quick-strip">
-          <div class="quick-strip-label">
-            <span>💡 Quick Voice Actions &amp; Technical Blueprints:</span>
-          </div>
-          <div class="quick-pills-row">
-            <button class="home-action-pill" data-welcome-query="30,000 के अंदर डिशवॉशर और चिमनी">🔍 Models under ₹30k</button>
-            <button class="home-action-pill" data-welcome-action="installation">🛠️ Chimney Installation</button>
-            <button class="home-action-pill" data-welcome-action="chimney_cleaning">🧼 Chimney Auto-Clean</button>
-            <button class="home-action-pill" data-welcome-action="dishwasher_cleaning">💧 Dishwasher Salt &amp; Care</button>
-            <button class="home-action-pill" data-welcome-action="dishwasher_loading">🍽️ How to Load Dishwasher</button>
-            <button class="home-action-pill" data-welcome-action="washing_guide">🌀 Fabric Care Guide</button>
-            <button class="home-action-pill" data-welcome-action="tv_calibration">📺 TV Calibration</button>
-            <button class="home-action-pill" data-welcome-action="bldc_motor">⚡ Inverter BLDC Video</button>
-            <button class="home-action-pill" data-welcome-action="show_all">👁️ Browse All 20 Models</button>
+          <div class="welcome-quick-pills">
+            <button class="welcome-pill glass-button" data-welcome-query="30,000 के अंदर डिशवॉशर और चिमनी">🔍 Models under ₹30k</button>
+            <button class="welcome-pill glass-button" data-welcome-action="installation">🛠️ Chimney Installation</button>
+            <button class="welcome-pill glass-button" data-welcome-action="chimney_cleaning">🧼 Chimney Auto-Clean</button>
+            <button class="welcome-pill glass-button" data-welcome-action="dishwasher_cleaning">💧 Dishwasher Salt &amp; Care</button>
+            <button class="welcome-pill glass-button" data-welcome-action="dishwasher_loading">🍽️ How to Load Dishwasher</button>
+            <button class="welcome-pill glass-button" data-welcome-action="washing_guide">🌀 Fabric Care Guide</button>
+            <button class="welcome-pill glass-button" data-welcome-action="tv_calibration">📺 TV Calibration Guide</button>
+            <button class="welcome-pill glass-button" data-welcome-action="bldc_motor">⚡ Inverter BLDC Video</button>
+            <button class="welcome-pill glass-button" data-welcome-action="show_all">👁️ Browse All 20 Models</button>
           </div>
         </div>
       </div>
     `;
 
-    // Wire Category Cards Click Events
-    target.querySelectorAll('.tatwa-cat-card, .tatwa-cat-btn').forEach((elem) => {
-      elem.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const cat = elem.getAttribute('data-cat');
-        if (cat) {
-          hitTool({ category: cat });
-          showToast(`Opening ${cat.replace('_', ' ').toUpperCase()} Showcase`);
-        }
-      });
-    });
-
-    // Wire Quick Suggestion Pills
-    target.querySelectorAll('.home-action-pill').forEach((btn) => {
+    // Wire suggestion pills inside the welcome card
+    target.querySelectorAll('.welcome-pill').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const query = btn.getAttribute('data-welcome-query');
         const action = btn.getAttribute('data-welcome-action');
+        const cat = btn.getAttribute('data-welcome-category');
         if (query) {
           hitTool({ query });
           showToast(`Sending: "${query}"`);
+        } else if (cat) {
+          hitTool({ category: cat });
+          showToast(`Opening ${cat.replace('_', ' ').toUpperCase()} Showcase`);
         } else if (action) {
           if (action === 'washing_guide') {
             renderWashingMachineGuide(target);
@@ -5041,7 +4937,7 @@
     brandHomeBtn.addEventListener('click', (e) => {
       e.preventDefault();
       renderTatwaWelcomeScreen();
-      showToast('Returned to Categories Home Screen');
+      showToast('Returned to Home Screen');
     });
   }
 
@@ -5051,7 +4947,7 @@
     studioBadge.addEventListener('click', (e) => {
       e.preventDefault();
       renderTatwaWelcomeScreen();
-      showToast('Returned to Categories Home Screen');
+      showToast('Returned to Home Screen');
     });
   }
 
