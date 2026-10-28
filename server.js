@@ -212,12 +212,7 @@ app.get(['/api/stream/:sessionId', '/api/stream'], (req, res) => {
   res.write(': keepalive\n\n');
   room.sseClients.add(res);
 
-  // Replay last cached payload (flagged as isReplay: true so clients on reload ignore past state)
-  if (room.lastPayload) {
-    try {
-      res.write(`data: ${JSON.stringify({ ...room.lastPayload, isReplay: true })}\n\n`);
-    } catch (_) {}
-  }
+  // Do NOT replay historical payload to new connections (ensures reload defaults to Home screen)
 
   // Keep-alive heartbeat every 15s
   const heartbeat = setInterval(() => {
@@ -314,16 +309,7 @@ wss.on('connection', (ws, request) => {
     timestamp: new Date().toISOString()
   }));
 
-  // Replay last cached product display
-  if (room.lastPayload) {
-    try {
-      ws.send(JSON.stringify({
-        type: 'PRODUCT_UPDATE',
-        ...room.lastPayload,
-        isReplay: true
-      }));
-    } catch (_) {}
-  }
+  // Do NOT replay historical payload to new connections (ensures reload defaults to Home screen)
 
   ws.on('message', (message) => {
     try {

@@ -46,16 +46,7 @@ export class SessionRoom extends DurableObject {
       const encoder = new TextEncoder();
       writer.write(encoder.encode(': keepalive\n\n'));
 
-      // If a product payload was previously displayed, replay it marked as isReplay so reloads ignore it
-      this.ctx.storage.get('lastPayload').then((lastPayload) => {
-        if (lastPayload) {
-          try {
-            writer.write(encoder.encode(`data: ${JSON.stringify({ ...lastPayload, isReplay: true })}\n\n`));
-          } catch (e) {
-            console.warn('[SessionRoom] Failed to send cached payload to SSE client', e);
-          }
-        }
-      });
+      // Do NOT replay historical payload to new connections (ensures reload defaults to Home screen)
 
       return new Response(readable, {
         status: 200,
@@ -92,19 +83,7 @@ export class SessionRoom extends DurableObject {
         })
       );
 
-      // Replay last cached product display to the newly connected socket
-      const lastPayload = await this.ctx.storage.get('lastPayload');
-      if (lastPayload) {
-        try {
-          server.send(
-            JSON.stringify({
-              type: 'PRODUCT_UPDATE',
-              ...lastPayload,
-              isReplay: true
-            })
-          );
-        } catch (_) {}
-      }
+      // Do NOT replay historical payload to new connections (ensures reload defaults to Home screen)
 
       return new Response(null, {
         status: 101,

@@ -6,6 +6,7 @@
 
 (() => {
   const pageStartTime = Date.now();
+  let userInteractedRecently = false;
 
   // 1. Backend URL Management
   function getInitialBackendUrl() {
@@ -622,6 +623,13 @@
         console.log('[Visualizer] Ignored stale payload from before page reload:', payload.title || payload.componentType);
         return;
       }
+    } else {
+      // If payload has NO timestamp and arrives during startup window (stale replay from older server),
+      // discard it unless the user explicitly triggered an interaction on this page
+      if (Date.now() - pageStartTime < 3500 && !userInteractedRecently) {
+        console.log('[Visualizer] Ignored unversioned stale payload during startup window:', payload.title || payload.componentType);
+        return;
+      }
     }
 
     console.log('[Visualizer] Incoming event received:', payload.title || payload.componentType, payload);
@@ -859,21 +867,33 @@
   function startSmartPolling() {
     if (pollingInterval) clearInterval(pollingInterval);
 
+    // Initial state fingerprint from server: do not render whatever was already on the server before reload
+    let initialPollDone = false;
+
     async function pollState() {
       try {
         const stateUrl = `${backendUrl}/api/last-state?sessionId=${encodeURIComponent(sessionId)}&_t=${Date.now()}`;
         const res = await fetch(stateUrl);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.payload && !data.payload.isReplay) {
-            handleIncomingImages(data.payload);
+          if (data && data.payload) {
+            if (!initialPollDone) {
+              initialPollDone = true;
+              console.log('[Visualizer] Initial poll completed: recorded cached server state without rendering to preserve Home Screen');
+              return;
+            }
+            if (!data.payload.isReplay) {
+              handleIncomingImages(data.payload);
+            }
           }
         }
       } catch (_) {}
     }
 
-    pollState();
-    pollingInterval = setInterval(pollState, 1200);
+    setTimeout(() => {
+      pollState();
+      pollingInterval = setInterval(pollState, 1500);
+    }, 1200);
   }
 
   function initLiveSync() {
@@ -4561,6 +4581,7 @@
 
   // 6. Send Tool Call to Backend
   async function hitTool(payload) {
+    userInteractedRecently = true;
     try {
       const q = (payload.query || payload.action || '').toLowerCase();
       const container = document.getElementById('component-viewport') || productGrid;
@@ -4960,10 +4981,12 @@
 
   if (qCat) {
     hitTool({ category: qCat, maxPrice: qMaxPrice ? Number(qMaxPrice) : undefined });
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
   } else if (qAction) {
     hitTool({ action: qAction });
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
   } else {
-    // Default starting point: Render the Category Home Screen directly on the right canvas
+    // Default starting point: Render the Clean Minimal Home Screen directly on the right canvas
     renderTatwaWelcomeScreen();
   }
 
