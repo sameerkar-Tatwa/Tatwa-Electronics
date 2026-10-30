@@ -1596,7 +1596,7 @@ export function resolveToolRequest(rawInput = {}) {
       componentType: 'bldc-motor',
       title: 'Tatwa 1500 m³/hr Suction & Inverter BLDC Motor',
       subtitle: '1500 m³/hr High-Velocity Suction • 150W Inverter BLDC Motor • 12-Year Warranty',
-      videoUrl: 'images/bldc_motor.mp4',
+      videoUrl: 'images/1030.webm',
       suctionSpecs: {
         capacity: '1500 m³/hr High-Velocity Airflow',
         motorType: '150W Brushless DC (BLDC) Inverter Motor',
@@ -1609,7 +1609,7 @@ export function resolveToolRequest(rawInput = {}) {
         {
           name: '1500 m3/hr Suction & BLDC Motor Video',
           title: '1500 m³/hr High Airflow & Brushless DC Motor',
-          imageUrl: 'images/bldc_motor.mp4',
+          imageUrl: 'images/1030.webm',
           description: '1500 m³/hr suction purges dense cooking fumes in seconds, consumes only 150W, and runs whisper-quiet with 12-year motor warranty.'
         }
       ]

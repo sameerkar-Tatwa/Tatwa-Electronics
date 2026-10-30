@@ -4056,7 +4056,7 @@
         <video
           id="bldc-loop-video"
           class="bldc-pure-video"
-          src="images/bldc_motor.mp4"
+          src="images/1030.webm"
           autoplay
           loop
           muted
